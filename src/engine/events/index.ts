@@ -1,0 +1,252 @@
+import type { GameEvent, EventTemplate, EventChoice } from './types';
+import { cultivationTemplates } from './cultivationTemplates';
+import { magicTemplates } from './magicTemplates';
+import { scifiTemplates } from './scifiTemplates';
+import { apocalypseTemplates } from './apocalypseTemplates';
+import { wuxiaTemplates } from './wuxiaTemplates';
+import type { Stats } from '@/engine/types';
+
+// ═══════════════════════════════════════════════════════════════
+// Template → GameEvent expansion
+// ═══════════════════════════════════════════════════════════════
+
+const worldTemplates: Record<string, EventTemplate[]> = {
+  cultivation: cultivationTemplates,
+  magic: magicTemplates,
+  scifi: scifiTemplates,
+  apocalypse: apocalypseTemplates,
+  wuxia: wuxiaTemplates,
+};
+
+// Word banks for template interpolation
+const wordBanks: Record<string, Record<string, string[]>> = {
+  cultivation: {
+    location: ['村口老槐树', '后山禁地', '村东古井', '西边的瀑布', '北山石窟', '南坡竹林', '自家后院', '祠堂密室'],
+    npc: ['老铁匠', '王猎户', '李大娘', '张秀才', '云游道士', '疯老头', '算命先生', '隔壁老奶奶'],
+    legend: ['上古剑仙', '九尾妖狐', '东海龙王', '昆仑圣母', '魔道至尊', '天道之子', '逍遥散仙'],
+    discovery: ['发现了一块发光的石头', '听到了奇怪的声音', '看到了一道金光', '闻到了一股异香', '踩到了一块软软的东西'],
+    reaction: ['你吓得跑回了家', '你好奇地走近查看', '你感觉体内有什么在涌动', '你记住这个地方，准备以后再来'],
+  },
+  magic: {
+    location: ['魔法森林', '学院后院', '魔法井边', '禁忌图书馆', '元素祭坛', '妖精花园'],
+    npc: ['魔法导师', '神秘商人', '精灵使者', '龙族长者', '魔女', '学院院长'],
+    legend: ['真理之塔', '元素之王', '暗影领主', '古代大法师', '创世神龙', '魔法之源'],
+    discovery: ['发现了一本魔法书', '看到了奇异的光芒', '听到了元素的声音', '感受到了强大的魔力波动'],
+    reaction: ['你小心翼翼地靠近', '你兴奋地去查看', '你感到一阵恐惧', '你记下了这个位置'],
+  },
+  scifi: {
+    location: ['废弃空间站', '小行星带', '殖民星球表面', '地下实验室', '星际港口', '虚拟现实'],
+    npc: ['AI助手', '星际商人', '外星生物', '科学家', '舰长', '机器人'],
+    legend: ['创世引擎', '维度之门', '星际联邦', '远古文明', '黑洞之城', '量子网络'],
+    discovery: ['检测到未知信号', '发现了古代遗迹', '收到了神秘讯息', '扫描到异常能量'],
+    reaction: ['你决定前去调查', '你谨慎地记录数据', '你感到一阵兴奋', '你启动了防护系统'],
+  },
+  apocalypse: {
+    location: ['废墟城市', '辐射区', '地下掩体', '变异森林', '垃圾场', '废弃军事基地'],
+    npc: ['幸存者', '变异人', '科学家', '掠夺者', '商人', '老兵'],
+    legend: ['战前文明', '净化装置', '地下城市', '新纪元', '废土之王', '绿洲传说'],
+    discovery: ['发现了一个罐头', '检测到低辐射区域', '看到了远处的烟雾', '找到了一处水源'],
+    reaction: ['你决定去查看', '你保持警惕', '你快速离开', '你记下了这个位置'],
+  },
+  wuxia: {
+    location: ['华山之巅', '少林寺', '江南水乡', '西域大漠', '幽谷竹林', '江湖酒馆'],
+    npc: ['老乞丐', '剑客', '武林前辈', '神秘女子', '朝廷命官', '魔教中人'],
+    legend: ['倚天剑', '屠龙刀', '九阳神功', '降龙十八掌', '武林至尊', '华山论剑'],
+    discovery: ['发现了一本秘籍', '看到了剑光', '听到了琴声', '闻到了酒香'],
+    reaction: ['你拱手行礼', '你暗中戒备', '你好奇地靠近', '你默默记在心中'],
+  },
+};
+
+// Fill in template placeholders
+function interpolateTemplate(text: string, worldId: string): string {
+  const bank = wordBanks[worldId] ?? {};
+  let result = text;
+  for (const [key, values] of Object.entries(bank)) {
+    const regex = new RegExp(`\{${key}\}`, 'g');
+    if (result.includes(`{${key}}`)) {
+      const pick = values[Math.floor(Math.random() * values.length)];
+      result = result.replace(regex, pick);
+    }
+  }
+  return result;
+}
+
+// Expand a template into multiple GameEvents
+function expandTemplate(worldId: string, template: EventTemplate): GameEvent[] {
+  const events: GameEvent[] = [];
+  for (const [index, tmpl] of template.templates.entries()) {
+    const text = interpolateTemplate(tmpl, worldId);
+    events.push({
+      id: `${template.id}_v${index}`,
+      worldId,
+      category: template.category,
+      age: Math.floor((template.minAge + template.maxAge) / 2),
+      text,
+      choices: template.choices,
+      effects: template.effects,
+      conditions: template.conditions,
+      requiredFlags: template.requiredFlags,
+      flags: template.flags,
+      probability: template.probability,
+      identityExclusive: template.identityExclusive,
+      talentExclusive: template.talentExclusive,
+      chainPriority: template.chainPriority,
+    });
+  }
+  return events;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Generate ALL events for ALL worlds
+// ═══════════════════════════════════════════════════════════════
+
+export function generateAllEvents(): GameEvent[] {
+  const allEvents: GameEvent[] = [];
+  for (const [worldId, templates] of Object.entries(worldTemplates)) {
+    for (const template of templates) {
+      const expanded = expandTemplate(worldId, template);
+      allEvents.push(...expanded);
+    }
+  }
+  return allEvents;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Get available events for a specific world + age + stats
+// ═══════════════════════════════════════════════════════════════
+
+export function getAvailableEvents(
+  worldId: string,
+  age: number,
+  stats: Stats,
+  flags: string[],
+  identityId: string,
+  talentLevel?: string
+): GameEvent[] {
+  const templates = worldTemplates[worldId] ?? [];
+  const available: GameEvent[] = [];
+
+  for (const template of templates) {
+    // Check age range
+    if (age < template.minAge || age > template.maxAge) continue;
+
+    // Check identity exclusive
+    if (template.identityExclusive && template.identityExclusive !== identityId) continue;
+
+    // Check talent exclusive
+    if (template.talentExclusive) {
+      if (template.talentExclusive === 'not_trash') {
+        if (talentLevel === 'trash') continue;
+      } else if (template.talentExclusive !== talentLevel) {
+        continue;
+      }
+    }
+
+    // Check required flags
+    if (template.requiredFlags) {
+      const hasAll = template.requiredFlags.every((f) => flags.includes(f));
+      if (!hasAll) continue;
+    }
+
+    // Check stat conditions
+    if (template.conditions) {
+      let pass = true;
+      for (const cond of template.conditions) {
+        const val = stats[cond.stat] ?? 0;
+        if (cond.min !== undefined && val < cond.min) { pass = false; break; }
+        if (cond.max !== undefined && val > cond.max) { pass = false; break; }
+      }
+      if (!pass) continue;
+    }
+
+    // Expand and add
+    const expanded = expandTemplate(worldId, template);
+    // Pick one random variation per template
+    if (expanded.length > 0) {
+      const pick = expanded[Math.floor(Math.random() * expanded.length)];
+      available.push(pick);
+    }
+  }
+
+  return available;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Pick a random event weighted by probability
+// ═══════════════════════════════════════════════════════════════
+
+export function pickEvent(events: GameEvent[]): GameEvent | null {
+  if (events.length === 0) return null;
+
+  // 1. Check for chain events (highest priority)
+  const chainEvents = events.filter((e) => e.chainPriority && e.chainPriority > 0);
+  if (chainEvents.length > 0) {
+    const maxPriority = Math.max(...chainEvents.map((e) => e.chainPriority || 0));
+    const highest = chainEvents.filter((e) => e.chainPriority === maxPriority);
+    return highest[Math.floor(Math.random() * highest.length)];
+  }
+
+  // 2. Normal probability filter + weighted random
+  const roll = Math.random();
+  const eligible = events.filter((e) => e.probability >= roll);
+  if (eligible.length === 0) return null;
+
+  const totalWeight = eligible.reduce((sum, e) => sum + e.probability, 0);
+  let random = Math.random() * totalWeight;
+
+  for (const event of eligible) {
+    random -= event.probability;
+    if (random <= 0) return event;
+  }
+
+  return eligible[eligible.length - 1];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Apply event effects to stats
+// ═══════════════════════════════════════════════════════════════
+
+export function applyEffects(stats: Stats, effects: Partial<Stats>): Stats {
+  const newStats = { ...stats };
+  for (const key of Object.keys(effects) as (keyof Stats)[]) {
+    const val = effects[key];
+    if (val !== undefined) {
+      newStats[key] = Math.max(0, Math.min(200, (newStats[key] ?? 0) + val));
+    }
+  }
+  return newStats;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Process a choice outcome
+// ═══════════════════════════════════════════════════════════════
+
+export function processChoice(choice: EventChoice): {
+  success: boolean;
+  text: string;
+  effects: Partial<Stats>;
+  flags?: string[];
+} {
+  const roll = Math.random();
+  const success = roll <= choice.successRate;
+
+  return {
+    success,
+    text: success ? choice.successText : choice.failText,
+    effects: success ? choice.effects : (choice.failEffects ?? choice.effects),
+    flags: choice.flags,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Event counts per world
+// ═══════════════════════════════════════════════════════════════
+
+export function getEventCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const [worldId, templates] of Object.entries(worldTemplates)) {
+    counts[worldId] = templates.reduce((sum, t) => sum + t.templates.length, 0);
+  }
+  counts.total = Object.values(counts).reduce((a, b) => a + b, 0);
+  return counts;
+}
