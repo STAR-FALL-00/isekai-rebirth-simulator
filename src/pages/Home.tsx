@@ -177,7 +177,7 @@ export default function Home() {
           {titleChars.map((char, i) => (
             <motion.span
               key={i}
-              className="font-display text-5xl sm:text-6xl md:text-[56px] font-black text-text-primary text-glow-gold inline-block"
+              className="font-display text-3xl sm:text-5xl md:text-6xl font-black text-text-primary text-glow-gold inline-block"
               style={{ letterSpacing: '0.15em' }}
               variants={{
                 hidden: { opacity: 0, y: 30 },
@@ -198,7 +198,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
-          className="font-body text-base text-text-secondary italic mb-10"
+          className="font-body text-sm sm:text-base text-text-secondary italic mb-8 sm:mb-10"
           style={{ letterSpacing: '0.2em' }}
         >
           踏上万劫轮回之路，书写属于你的传奇
@@ -215,7 +215,7 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="w-[240px] h-14 rounded-[28px] font-body text-xl font-bold text-[#0A0A1A] flex items-center justify-center gap-2 transition-shadow duration-300"
+              className="w-[200px] sm:w-[240px] h-12 sm:h-14 rounded-[28px] font-body text-lg sm:text-xl font-bold text-[#0A0A1A] flex items-center justify-center gap-2 transition-shadow duration-300"
               style={{
                 background: 'linear-gradient(135deg, #D4A843, #B8922F)',
                 border: '1px solid rgba(212, 168, 67, 0.5)',
@@ -242,7 +242,7 @@ export default function Home() {
 
         {/* Secondary Buttons */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 sm:gap-6"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-6 w-full sm:w-auto px-4 sm:px-0"
           initial="hidden"
           animate="visible"
           variants={{
@@ -270,7 +270,7 @@ export default function Home() {
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="w-[120px] h-11 rounded-[22px] glass-panel font-body text-sm font-bold text-text-primary flex items-center justify-center gap-2 hover:border-border-glow hover:bg-[rgba(26,26,58,0.8)] transition-all duration-200"
+                  className="w-full sm:w-[120px] h-11 rounded-[22px] glass-panel font-body text-sm font-bold text-text-primary flex items-center justify-center gap-2 hover:border-border-glow hover:bg-[rgba(26,26,58,0.8)] transition-all duration-200"
                 >
                   <span className="text-text-secondary group-hover:text-text-primary">{item.icon}</span>
                   {item.label}
@@ -282,7 +282,7 @@ export default function Home() {
 
         {/* Floating World Orbs */}
         <motion.div
-          className="flex items-center gap-6 mt-16"
+          className="flex items-center gap-4 sm:gap-6 mt-12 sm:mt-16"
           initial="hidden"
           animate="visible"
           variants={{
@@ -327,7 +327,7 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.8, duration: 0.4 }}
-        className="absolute bottom-6 right-6 z-10 font-mono text-[11px] text-text-muted"
+        className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10 font-mono text-[11px] text-text-muted"
       >
         v1.0.0
       </motion.span>

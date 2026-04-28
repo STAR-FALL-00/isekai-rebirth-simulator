@@ -378,21 +378,21 @@ function StandardRankingCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay, ease: easeSmooth }}
       whileHover={{ scale: 1.01, backgroundColor: 'rgba(26,26,58,0.8)' }}
-      className="relative mb-2 rounded-xl p-3.5 cursor-pointer transition-colors duration-150"
+      className="relative mb-2 rounded-xl p-3 sm:p-3.5 cursor-pointer transition-colors duration-150"
       style={{
         backgroundColor: '#12122A',
         border: '1px solid #2A2A5A',
       }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* rank */}
-        <div className="flex-shrink-0 w-10 text-center">
-          <span className="font-mono text-lg font-bold text-[#4A4A7A]">{entry.rank}</span>
+        <div className="flex-shrink-0 w-8 sm:w-10 text-center">
+          <span className="font-mono text-base sm:text-lg font-bold text-[#4A4A7A]">{entry.rank}</span>
         </div>
 
         {/* avatar */}
         <div
-          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-[#0A0A1A] font-bold text-sm"
+          className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#0A0A1A] font-bold text-xs sm:text-sm"
           style={{ background: `linear-gradient(135deg, ${worldColor}, ${worldColor}80)` }}
         >
           {entry.playerName[0]}
@@ -401,23 +401,23 @@ function StandardRankingCard({
         {/* info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-body text-[15px] font-bold text-[#F0E6D3]">
+            <span className="font-body text-sm sm:text-[15px] font-bold text-[#F0E6D3] truncate">
               {entry.playerName}
             </span>
           </div>
-          <div className="flex items-center gap-1.5 text-[#8A8AB8] font-body text-[12px]">
+          <div className="flex items-center gap-1.5 text-[#8A8AB8] font-body text-[11px] sm:text-[12px]">
             <span
               className="inline-block w-1.5 h-1.5 rounded-full"
               style={{ backgroundColor: worldColor }}
             />
-            {getWorldName(entry.worldId)} · {entry.identityName}
+            <span className="truncate">{getWorldName(entry.worldId)} · {entry.identityName}</span>
           </div>
         </div>
 
         {/* ending + score */}
         <div className="text-right flex-shrink-0">
-          <div className="font-mono text-xl font-bold text-[#F0E6D3]">{entry.scoreLabel}</div>
-          <div className="font-body text-[11px] text-[#4A4A7A]">{entry.date}</div>
+          <div className="font-mono text-lg sm:text-xl font-bold text-[#F0E6D3]">{entry.scoreLabel}</div>
+          <div className="font-body text-[10px] sm:text-[11px] text-[#4A4A7A]">{entry.date}</div>
         </div>
       </div>
     </motion.div>
@@ -450,36 +450,38 @@ export default function Leaderboard() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: easeGhost }}
-        className="relative px-6 pt-6 pb-4"
+        className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4"
       >
-        {/* back button */}
-        <button
-          onClick={() => navigate('/')}
-          className="absolute left-6 top-6 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-105"
-          style={{ backgroundColor: '#1A1A3A', border: '1px solid #2A2A5A' }}
-        >
-          <ArrowLeft className="w-5 h-5 text-[#8A8AB8]" />
-        </button>
+        <div className="flex items-center justify-between mb-3">
+          {/* back button */}
+          <button
+            onClick={() => navigate('/')}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-105"
+            style={{ backgroundColor: '#1A1A3A', border: '1px solid #2A2A5A' }}
+          >
+            <ArrowLeft className="w-5 h-5 text-[#8A8AB8]" />
+          </button>
+
+          {/* personal quick view */}
+          <div className="text-right">
+            <div className="font-mono text-xs sm:text-sm text-[#D4A843]">你的排名: #156</div>
+            <div className="font-mono text-[10px] sm:text-xs text-[#8A8AB8] mt-0.5">最佳: 156年</div>
+          </div>
+        </div>
 
         {/* title */}
         <div className="text-center">
-          <div className="flex items-center justify-center gap-3 mb-1">
-            <Trophy className="w-7 h-7 text-[#D4A843]" />
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1">
+            <Trophy className="w-5 h-5 sm:w-7 sm:h-7 text-[#D4A843]" />
             <h1
-              className="font-display text-[36px] font-black text-[#F0E6D3]"
+              className="font-display text-2xl sm:text-[36px] font-black text-[#F0E6D3]"
               style={{ textShadow: '0 0 30px rgba(212,168,67,0.3)' }}
             >
               传奇排行榜
             </h1>
-            <Trophy className="w-7 h-7 text-[#D4A843]" />
+            <Trophy className="w-5 h-5 sm:w-7 sm:h-7 text-[#D4A843]" />
           </div>
-          <p className="font-body text-sm text-[#8A8AB8]">最强转生者排名，看看你排第几</p>
-        </div>
-
-        {/* personal quick view */}
-        <div className="absolute right-6 top-6 text-right">
-          <div className="font-mono text-sm text-[#D4A843]">你的排名: #156</div>
-          <div className="font-mono text-xs text-[#8A8AB8] mt-0.5">最佳: 156年</div>
+          <p className="font-body text-xs sm:text-sm text-[#8A8AB8]">最强转生者排名，看看你排第几</p>
         </div>
       </motion.header>
 
@@ -498,19 +500,19 @@ export default function Leaderboard() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className="relative flex items-center gap-2 px-4 py-2 rounded-full font-body text-[15px] font-bold transition-all duration-200"
+                className="relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-body text-sm sm:text-[15px] font-bold transition-all duration-200"
                 style={{
                   backgroundColor: isActive ? '#1A1A3A' : 'transparent',
                   border: isActive ? '1px solid #2A2A5A' : '1px solid transparent',
                   color: isActive ? '#F0E6D3' : '#8A8AB8',
                 }}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {tab.label}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className="absolute -bottom-0.5 left-4 right-4 h-0.5 rounded-full bg-[#D4A843]"
+                    className="absolute -bottom-0.5 left-3 sm:left-4 right-3 sm:right-4 h-0.5 rounded-full bg-[#D4A843]"
                     transition={{ duration: 0.3, ease: easeSmooth }}
                   />
                 )}
@@ -521,7 +523,7 @@ export default function Leaderboard() {
       </motion.div>
 
       {/* ──────── Ranking List ──────── */}
-      <div className="flex-1 px-6 pb-6 max-w-4xl mx-auto w-full">
+      <div className="flex-1 px-3 sm:px-6 pb-6 max-w-4xl mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -567,7 +569,7 @@ export default function Leaderboard() {
           }}
         >
           {/* stats grid */}
-          <div className="grid grid-cols-3 md:grid-cols-3 sm:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
             {/* total reincarnations */}
             <div className="text-center p-4 rounded-xl transition-all duration-150 hover:scale-[1.02]" style={{ backgroundColor: '#1A1A3A40' }}>
               <div className="font-body text-[13px] text-[#4A4A7A] mb-1">总转生次数</div>

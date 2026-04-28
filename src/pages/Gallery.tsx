@@ -414,7 +414,7 @@ function EndingDetailModal({ ending, onClose }: { ending: EndingItem; onClose: (
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
-        className="relative w-full max-w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl border border-border-subtle bg-bg-secondary p-6 sm:p-8"
+        className="relative w-full max-w-[min(600px,92vw)] max-h-[80vh] overflow-y-auto rounded-2xl border border-border-subtle bg-bg-secondary p-5 sm:p-8"
         onClick={e => e.stopPropagation()}
       >
         <button
@@ -578,7 +578,7 @@ export default function Gallery() {
               <h2 className="font-display text-xl font-bold text-text-primary">世界完成度</h2>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
               {WORLD_PROGRESS.map((world, i) => {
                 const pct = Math.round((world.endingsFound / world.endingsTotal) * 100);
                 return (
@@ -588,7 +588,7 @@ export default function Gallery() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 + i * 0.1, ease: easeSmooth }}
                     whileHover={{ scale: 1.03 }}
-                    className="rounded-2xl border border-border-subtle bg-bg-secondary p-5 flex flex-col items-center"
+                    className="rounded-2xl border border-border-subtle bg-bg-secondary p-4 sm:p-5 flex flex-col items-center"
                   >
                     {/* World color bar */}
                     <div className="w-full h-1 rounded-full mb-4" style={{ background: world.color }} />
@@ -707,7 +707,7 @@ export default function Gallery() {
             </div>
 
             {/* Ending Grid */}
-            <div ref={endingsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div ref={endingsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               <AnimatePresence mode="wait">
                 {filteredEndings.map((ending, i) => (
                   <motion.div
@@ -718,7 +718,7 @@ export default function Gallery() {
                     transition={{ duration: 0.4, delay: i < 20 ? i * 0.03 : 0, ease: easeSmooth }}
                     whileHover={ending.discovered ? { scale: 1.03, y: -4 } : {}}
                     onClick={() => ending.discovered && setSelectedEnding(ending)}
-                    className={`relative rounded-xl border p-4 cursor-default ${
+                    className={`relative rounded-xl border p-3 sm:p-4 cursor-default ${
                       ending.discovered
                         ? 'bg-bg-secondary cursor-pointer'
                         : 'bg-bg-secondary/50 border-dashed'

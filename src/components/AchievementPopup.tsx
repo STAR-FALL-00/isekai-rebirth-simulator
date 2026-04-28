@@ -119,7 +119,7 @@ export default function AchievementPopup({ newAchievements, onDismiss }: Achieve
   }, [current, queue, onDismiss]);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none">
+    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none px-4">
       <AnimatePresence mode="wait">
         {current && (
           <motion.div
@@ -128,7 +128,7 @@ export default function AchievementPopup({ newAchievements, onDismiss }: Achieve
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
-            className="pointer-events-auto flex items-center gap-4 px-5 py-4 rounded-xl border shadow-2xl min-w-[320px] max-w-[420px]"
+            className="pointer-events-auto flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4 rounded-xl border shadow-2xl w-full max-w-[min(420px,90vw)]"
             style={{
               backgroundColor: 'rgba(20, 20, 40, 0.95)',
               borderColor: `${CATEGORY_COLORS[current.category] ?? '#D4A843'}60`,
@@ -162,10 +162,10 @@ export default function AchievementPopup({ newAchievements, onDismiss }: Achieve
                 </span>
                 <span className="text-[10px] font-body text-text-muted">成就解锁</span>
               </div>
-              <p className="font-display text-sm font-bold text-text-primary truncate">
+              <p className="font-display text-xs sm:text-sm font-bold text-text-primary truncate">
                 {current.title}
               </p>
-              <p className="font-body text-xs text-text-secondary truncate">
+              <p className="font-body text-[11px] sm:text-xs text-text-secondary truncate">
                 {current.description}
               </p>
             </div>

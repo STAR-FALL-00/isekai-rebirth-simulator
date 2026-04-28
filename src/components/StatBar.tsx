@@ -23,7 +23,7 @@ export default function StatBar({ label, value, maxValue = 200, color, delta = 0
 
   return (
     <div className="flex items-center gap-3 w-full relative">
-      <span className="text-sm font-body text-text-secondary w-16 shrink-0 text-right">{label}</span>
+      <span className="text-xs sm:text-sm font-body text-text-secondary w-12 sm:w-16 shrink-0 text-right">{label}</span>
       <div className="flex-1 h-3 bg-bg-tertiary rounded-full overflow-hidden border border-border-subtle">
         <motion.div
           className="h-full rounded-full"
@@ -37,7 +37,7 @@ export default function StatBar({ label, value, maxValue = 200, color, delta = 0
       </div>
       <motion.span
         key={`val-${flashKey}`}
-        className={`text-sm font-mono font-bold w-10 shrink-0 ${isPositive ? 'text-accent-green' : isNegative ? 'text-accent-red' : 'text-text-primary'}`}
+        className={`text-xs sm:text-sm font-mono font-bold w-8 sm:w-10 shrink-0 ${isPositive ? 'text-accent-green' : isNegative ? 'text-accent-red' : 'text-text-primary'}`}
         initial={delta !== 0 ? { scale: 1.4 } : false}
         animate={{ scale: 1 }}
         transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}

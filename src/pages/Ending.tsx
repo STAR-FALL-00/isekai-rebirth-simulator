@@ -1403,7 +1403,7 @@ export default function Ending() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: easeSmooth }}
-              className="flex flex-wrap justify-center gap-4 mb-8"
+              className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 px-2"
             >
               {[
                 { icon: <Clock size={22} style={{ color: worldColor }} />, label: '享年', value: `${ending.age} 岁`, sub: ending.worldName },
@@ -1418,7 +1418,7 @@ export default function Ending() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.1, ease: easeSmooth }}
                   whileHover={{ scale: 1.03, y: -4 }}
-                  className="flex flex-col items-center px-5 py-4 rounded-xl border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm min-w-[110px]"
+                  className="flex flex-col items-center px-3 sm:px-5 py-3 sm:py-4 rounded-xl border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm min-w-[90px] sm:min-w-[110px]"
                 >
                   {stat.icon}
                   <span className="font-body text-xs text-text-secondary mt-2">{stat.label}</span>
@@ -1708,14 +1708,14 @@ export default function Ending() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: easeSmooth }}
-              className="flex flex-wrap justify-center gap-4"
+              className="flex flex-wrap justify-center gap-3 sm:gap-4 px-4"
             >
               <div className="flex flex-col items-center gap-2">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={(e) => { e.stopPropagation(); navigate('/rebirth'); }}
-                  className="flex items-center gap-2 px-8 py-3 rounded-full font-body text-base font-bold text-white transition-shadow duration-300"
+                  className="flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-body text-sm sm:text-base font-bold text-white transition-shadow duration-300"
                   style={{
                     background: `linear-gradient(135deg, ${worldColor}, ${worldColor}88)`,
                     boxShadow: `0 4px 20px ${worldColor}40`,
@@ -1752,7 +1752,7 @@ export default function Ending() {
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.5, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-6 font-body text-xs text-text-muted"
+            className="absolute bottom-4 sm:bottom-6 font-body text-xs text-text-muted"
           >
             点击任意处跳过动画
           </motion.p>

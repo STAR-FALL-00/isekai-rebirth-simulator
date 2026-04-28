@@ -141,7 +141,7 @@ export default function Rebirth() {
               </p>
             </motion.div>
 
-            <div className="w-full max-w-5xl flex flex-col lg:flex-row gap-6">
+            <div className="w-full max-w-5xl flex flex-col lg:flex-row gap-4 sm:gap-6">
 
               {/* ── Left: Equipped Items + Start Button ── */}
               <motion.div variants={fadeIn} className="flex-1 flex flex-col gap-5">
@@ -386,7 +386,7 @@ export default function Rebirth() {
             </motion.h2>
 
             {/* Shuffling world cards */}
-            <div className="relative w-[320px] h-[420px]">
+            <div className="relative w-[min(320px,85vw)] h-[min(420px,55vh)]">
               <AnimatePresence mode="popLayout">
                 {worlds.map((world, idx) => {
                   const isActive = idx === shuffleIndex;
@@ -486,13 +486,13 @@ export default function Rebirth() {
               initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
               animate={{ opacity: 1, scale: 1, rotateY: 0 }}
               transition={{ delay: 0.5, duration: 0.8, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
-              className="w-[320px] rounded-2xl overflow-hidden mb-6"
+              className="w-[min(320px,90vw)] rounded-2xl overflow-hidden mb-6"
               style={{
                 border: `3px solid ${revealedWorld.themeColor}`,
                 boxShadow: `0 0 60px ${revealedWorld.themeColor}44, 0 20px 60px rgba(0,0,0,0.5)`,
               }}
             >
-              <div className="relative h-[220px]">
+              <div className="relative h-[180px] sm:h-[220px]">
                 <img
                   src={worldImages[revealedWorld.id]}
                   alt={revealedWorld.name}

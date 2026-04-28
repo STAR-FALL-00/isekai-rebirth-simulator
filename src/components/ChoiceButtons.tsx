@@ -30,7 +30,7 @@ export default function ChoiceButtons({ choices, color = '#D4A843', disabled = f
             if (!disabled) choice.onClick();
           }}
           disabled={disabled}
-          className={`flex-1 border rounded-xl px-5 py-4 text-left font-body transition-all duration-200 ${
+          className={`flex-1 border rounded-xl px-4 py-3 sm:px-5 sm:py-4 text-left font-body transition-all duration-200 ${
             disabled
               ? 'bg-bg-tertiary/50 border-border-subtle/50 text-text-muted cursor-not-allowed opacity-60'
               : 'bg-bg-tertiary border-border-subtle text-text-primary hover:border-opacity-100 cursor-pointer'
