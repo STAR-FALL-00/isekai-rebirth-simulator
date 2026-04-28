@@ -4,6 +4,7 @@ import { magicTemplates } from './magicTemplates';
 import { scifiTemplates } from './scifiTemplates';
 import { apocalypseTemplates } from './apocalypseTemplates';
 import { wuxiaTemplates } from './wuxiaTemplates';
+import { swordartTemplates } from './swordartTemplates';
 import type { Stats } from '@/engine/types';
 
 // ═══════════════════════════════════════════════════════════════
@@ -16,6 +17,7 @@ const worldTemplates: Record<string, EventTemplate[]> = {
   scifi: scifiTemplates,
   apocalypse: apocalypseTemplates,
   wuxia: wuxiaTemplates,
+  floating_citadel: swordartTemplates,
 };
 
 // Auto-map identity-exclusive events to a romance NPC for default relationship effects
@@ -80,6 +82,18 @@ const IDENTITY_ROMANCE_MAP: Record<string, Record<string, string>> = {
     swordsman: 'sword_fairy',
     assassin_wuxia: 'poison_girl',
   },
+  floating_citadel: {
+    lone_wolf: 'feather',
+    guild_master: 'dawn',
+    blacksmith: 'hammer',
+    tamer: 'feather',
+    info_broker: 'feather',
+    chef: 'dawn',
+    frontliner: 'hammer',
+    healer: 'dawn',
+    merchant: 'feather',
+    roleplayer: 'feather',
+  },
 };
 
 // Word banks for template interpolation
@@ -118,6 +132,13 @@ const wordBanks: Record<string, Record<string, string[]>> = {
     legend: ['倚天剑', '屠龙刀', '九阳神功', '降龙十八掌', '武林至尊', '华山论剑'],
     discovery: ['发现了一本秘籍', '看到了剑光', '听到了琴声', '闻到了酒香'],
     reaction: ['你拱手行礼', '你暗中戒备', '你好奇地靠近', '你默默记在心中'],
+  },
+  floating_citadel: {
+    location: ['起始之镇', '一层草原', '二层森林', '三层迷宫', '湖边小屋', '交易市场', '锻造工坊', '公会大厅', 'Boss房间前', '安全区', '迷宫深处', '隐藏房间', '顶层花园', '地下监狱', '传送广场'],
+    npc: ['独行剑客', '公会成员', '情报贩子', '锻造学徒', '治疗师', '驯兽师'],
+    legend: ['千层塔建造者', '第一位解放者', '传说中的独行剑士', '黑铁骑士团', '虚空之刃'],
+    discovery: ['发现了一把发光的剑', '看到了奇怪的代码', '找到了隐藏通路', '触发了系统提示'],
+    reaction: ['你握紧武器准备战斗', '你决定先观察', '你感到心跳加速', '你记下了这个地点'],
   },
 };
 

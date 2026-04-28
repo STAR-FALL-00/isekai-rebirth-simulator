@@ -375,6 +375,54 @@ export const rebirthItems: RebirthItem[] = [
     statBonus: { luck: 10, special: 5 },
     rarity: 'legendary',
   },
+
+  // ── 浮空要塞 ──
+  {
+    id: 'old_sword_hilt',
+    name: '旧剑柄',
+    description: '一块断裂的剑柄，似乎来自某把名剑。装备后略微增加转生至浮空要塞的概率。',
+    worldBias: { floating_citadel: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'teleport_crystal_shard',
+    name: '传送水晶碎片',
+    description: '一块碎裂的水晶，内部还有微弱的传送能量。装备后初始幸运+5。',
+    statBonus: { luck: 5 },
+    rarity: 'common',
+  },
+  {
+    id: 'enhancement_stone',
+    name: '强化石',
+    description: '能提升武器性能的稀有矿石。装备后增加转生至浮空要塞的概率，初始力量+3。',
+    worldBias: { floating_citadel: 5 },
+    statBonus: { strength: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'taming_bell',
+    name: '驯兽铃',
+    description: '能安抚塔中怪物的铃铛。装备后增加转生至浮空要塞的概率，初始人缘+3。',
+    worldBias: { floating_citadel: 5 },
+    statBonus: { charisma: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'black_sword_fragment',
+    name: '黑剑碎片',
+    description: '一把传说中的黑剑的碎片，据说曾属于某位独行剑士。装备后大幅增加转生至浮空要塞的概率，初始剑技+8。',
+    worldBias: { floating_citadel: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6 },
+    statBonus: { special: 8, strength: 2 },
+    rarity: 'epic',
+  },
+  {
+    id: 'admin_access_card',
+    name: '管理员权限卡',
+    description: '一张刻着神秘代码的卡片，传闻能修改塔的某些规则。装备后可选择特定世界转生（100%命中），所有初始属性+5。',
+    worldBias: { floating_citadel: 100 },
+    statBonus: { strength: 5, intelligence: 5, charisma: 5, luck: 5, health: 5, special: 5 },
+    rarity: 'legendary',
+  },
 ];
 
 /** 根据稀有度获取颜色 */
@@ -408,6 +456,7 @@ export function calculateWorldWeights(
     scifi: 1,
     apocalypse: 1,
     wuxia: 1,
+    floating_citadel: 1,
   };
 
   const equippedItems = allItems.filter((item) => equippedItemIds.includes(item.id));

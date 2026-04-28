@@ -180,12 +180,24 @@ export const WUXIA_REALMS = [
   { stage: 7, name: '破碎虚空', maxAgeBase: 9999 },
 ];
 
+export const FLOATING_CITADEL_REALMS = [
+  { stage: 0, name: '初学者', maxAgeBase: 100 },
+  { stage: 1, name: '冒险者', maxAgeBase: 180 },
+  { stage: 2, name: '剑士', maxAgeBase: 300 },
+  { stage: 3, name: '骑士', maxAgeBase: 500 },
+  { stage: 4, name: '领主', maxAgeBase: 800 },
+  { stage: 5, name: '贤者', maxAgeBase: 1200 },
+  { stage: 6, name: '王者', maxAgeBase: 2000 },
+  { stage: 7, name: '解放者', maxAgeBase: 9999 },
+];
+
 export const WORLD_REALM_TABLES: Record<string, Array<{ stage: number; name: string; maxAgeBase: number }>> = {
   cultivation: CULTIVATION_REALMS,
   magic: MAGIC_REALMS,
   scifi: SCIFI_REALMS,
   apocalypse: APOCALYPSE_REALMS,
   wuxia: WUXIA_REALMS,
+  floating_citadel: FLOATING_CITADEL_REALMS,
 };
 
 export interface GameState {

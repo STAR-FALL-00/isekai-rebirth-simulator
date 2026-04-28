@@ -24,6 +24,11 @@ export const achievements: AchievementData[] = [
   { id: 'ach_wc_14', title: '百次转生', description: '累计完成100次转生', category: 'world', icon: 'repeat', condition: { type: 'total_reincarnations', target: 100 } },
   { id: 'ach_wc_15', title: '千次轮回', description: '累计完成1000次转生', category: 'world', icon: 'infinity', condition: { type: 'total_reincarnations', target: 1000 } },
 
+  // ── 浮空要塞 ──
+  { id: 'ach_fc_01', title: '初入浮空', description: '第一次在浮空要塞完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'floating_citadel' } },
+  { id: 'ach_fc_02', title: '浮空达人', description: '在浮空要塞完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'floating_citadel' } },
+  { id: 'ach_fc_03', title: '浮空全结局', description: '解锁浮空要塞的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'floating_citadel' } },
+
   // ═══════════════════════════════════════════════════════════════
   // STAT MILESTONES (18)
   // ═══════════════════════════════════════════════════════════════
@@ -46,6 +51,14 @@ export const achievements: AchievementData[] = [
   { id: 'ach_sm_17', title: '万寿无疆', description: '活过1000岁', category: 'stat', icon: 'infinity', condition: { type: 'max_age', target: 1000 } },
   { id: 'ach_sm_18', title: '天妒英才', description: '在10岁之前死亡', category: 'stat', icon: 'x-circle', condition: { type: 'min_age_death', target: 10 } },
 
+  // ── 浮空要塞 ──
+  { id: 'ach_fc_st_01', title: '剑技大师', description: '在浮空要塞技巧属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_fc_st_02', title: '力拔山河', description: '在浮空要塞力量属性达到200', category: 'stat', icon: 'dumbbell', condition: { type: 'max_stat_strength', target: 200 } },
+  { id: 'ach_fc_st_03', title: '众人敬仰', description: '在浮空要塞人缘属性达到200', category: 'stat', icon: 'heart', condition: { type: 'max_stat_charisma', target: 200 } },
+  { id: 'ach_fc_st_04', title: '剑技登峰', description: '在浮空要塞剑技属性达到200', category: 'stat', icon: 'sword', condition: { type: 'max_stat_special', target: 200 } },
+  { id: 'ach_fc_st_05', title: '钢铁之躯', description: '在浮空要塞生命值属性达到200', category: 'stat', icon: 'shield', condition: { type: 'max_stat_health', target: 200 } },
+  { id: 'ach_fc_st_06', title: '全能冒险者', description: '在浮空要塞单次转生所有属性都超过150', category: 'stat', icon: 'hexagon', condition: { type: 'all_stats_high', target: 150 } },
+
   // ═══════════════════════════════════════════════════════════════
   // SPECIAL EVENTS (15)
   // ═══════════════════════════════════════════════════════════════
@@ -65,6 +78,13 @@ export const achievements: AchievementData[] = [
   { id: 'ach_se_14', title: '和平主义者', description: '单次转生不触发任何战斗事件', category: 'event', icon: 'peace', condition: { type: 'no_combat', target: 1 } },
   { id: 'ach_se_15', title: '全事件收集', description: '触发过所有类型的事件', category: 'event', icon: 'check-circle', condition: { type: 'all_categories', target: 12 } },
 
+  // ── 浮空要塞 ──
+  { id: 'ach_fc_ev_01', title: '初战告捷', description: '在浮空要塞第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_fc_ev_02', title: '命中相遇', description: '在浮空要塞第一次触发恋爱事件', category: 'event', icon: 'heart', condition: { type: 'event_category', target: 'romance' } },
+  { id: 'ach_fc_ev_03', title: '隐藏通路', description: '在浮空要塞触发一次隐藏事件', category: 'event', icon: 'eye', condition: { type: 'event_category', target: 'hidden' } },
+  { id: 'ach_fc_ev_04', title: '战斗狂人', description: '在浮空要塞单次转生触发50个战斗事件', category: 'event', icon: 'crosshair', condition: { type: 'combat_events', target: 50 } },
+  { id: 'ach_fc_ev_05', title: '和平主义者', description: '在浮空要塞单次转生不触发任何战斗事件', category: 'event', icon: 'peace', condition: { type: 'no_combat', target: 1 } },
+
   // ═══════════════════════════════════════════════════════════════
   // SPEED RUNS (8)
   // ═══════════════════════════════════════════════════════════════
@@ -76,6 +96,9 @@ export const achievements: AchievementData[] = [
   { id: 'ach_sr_06', title: '闪电魔法', description: '在魔法大陆10年内完成转生', category: 'speed', icon: 'bolt', condition: { type: 'speed_run_world', target: 10, worldId: 'magic' } },
   { id: 'ach_sr_07', title: '光速星际', description: '在科幻星际10年内完成转生', category: 'speed', icon: 'rocket', condition: { type: 'speed_run_world', target: 10, worldId: 'scifi' } },
   { id: 'ach_sr_08', title: '闪电侠', description: '单次转生触发少于20个事件', category: 'speed', icon: 'timer', condition: { type: 'min_events', target: 20 } },
+
+  // ── 浮空要塞 ──
+  { id: 'ach_fc_sp_01', title: '极速攀登', description: '在浮空要塞10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'floating_citadel' } },
 
   // ═══════════════════════════════════════════════════════════════
   // SECRET DISCOVERIES (12)
@@ -92,6 +115,16 @@ export const achievements: AchievementData[] = [
   { id: 'ach_sd_10', title: '悲剧英雄', description: '单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
   { id: 'ach_sd_11', title: '传奇之路', description: '解锁一个秘密结局', category: 'secret', icon: 'sparkles', condition: { type: 'secret_ending', target: 1 } },
   { id: 'ach_sd_12', title: '成就猎人', description: '解锁50个成就', category: 'secret', icon: 'trophy', condition: { type: 'achievements', target: 50 } },
+
+  // ── 浮空要塞 ──
+  { id: 'ach_fc_se_01', title: '千层登顶', description: '在浮空要塞到达解放者境界', category: 'secret', icon: 'crown', condition: { type: 'max_realm', target: 7 } },
+  { id: 'ach_fc_se_02', title: '羽衣的守护者', description: '与羽衣达到恋人关系', category: 'secret', icon: 'heart', condition: { type: 'relationship_level', target: 50, key: 'yuhui' } },
+  { id: 'ach_fc_se_03', title: '铁锤的搭档', description: '与铁锤达到恋人关系', category: 'secret', icon: 'heart', condition: { type: 'relationship_level', target: 50, key: 'iron_hammer' } },
+  { id: 'ach_fc_se_04', title: '师徒同心', description: '与暗影和晨曦同时达到知己关系', category: 'secret', icon: 'star', condition: { type: 'relationship_dual', target: 50, key: 'shadow,dawn' } },
+  { id: 'ach_fc_se_05', title: '制裁红名', description: '击败血刃', category: 'secret', icon: 'skull', condition: { type: 'flag_set', target: 1, key: 'defeat_blood_blade' } },
+  { id: 'ach_fc_se_06', title: '纯粹之剑', description: '不使用剑技击败守护者', category: 'secret', icon: 'sword', condition: { type: 'flag_set', target: 1, key: 'pure_sword_victory' } },
+  { id: 'ach_fc_se_07', title: '独行攻略者', description: '独自击败楼层守护者', category: 'secret', icon: 'user', condition: { type: 'flag_set', target: 1, key: 'solo_boss_clear' } },
+  { id: 'ach_fc_se_08', title: '真相追寻者', description: '发现浮空要塞的真相', category: 'secret', icon: 'search', condition: { type: 'flag_set', target: 1, key: 'discover_fc_truth' } },
 
   // ═══════════════════════════════════════════════════════════════
   // META ACHIEVEMENTS (12)

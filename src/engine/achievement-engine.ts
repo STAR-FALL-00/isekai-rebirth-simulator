@@ -164,6 +164,9 @@ function checkCondition(
     case 'max_stat_special':
       return gameState.stats.special >= target;
 
+    case 'max_stat_strength':
+      return gameState.stats.strength >= target;
+
     case 'min_stat':
       return gameState.stats.strength <= target;
 
@@ -188,6 +191,9 @@ function checkCondition(
       const vals = Object.values(gameState.stats);
       return vals.length > 0 && vals.every((v) => v >= target);
     }
+
+    case 'max_realm':
+      return gameState.realm >= target;
 
     case 'all_stats_low': {
       const vals = Object.values(gameState.startingStats ?? gameState.stats);
@@ -222,6 +228,21 @@ function checkCondition(
 
     case 'no_romance':
       return (evtCats.romance ?? 0) === 0 && (gameState.isDead || !!gameState.ending);
+
+    case 'relationship_level': {
+      const npcId = c.key ?? '';
+      return (gameState.relationships?.[npcId] ?? 0) >= target;
+    }
+
+    case 'relationship_dual': {
+      const [npc1, npc2] = (c.key ?? '').split(',');
+      return (gameState.relationships?.[npc1] ?? 0) >= target && (gameState.relationships?.[npc2] ?? 0) >= target;
+    }
+
+    case 'flag_set': {
+      const flag = c.key ?? '';
+      return gameState.flags?.includes(flag) ?? false;
+    }
 
     case 'all_categories': {
       const categories = [

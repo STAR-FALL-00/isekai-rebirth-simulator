@@ -104,5 +104,6 @@ export interface AchievementData {
     type: string;
     target: string | number;
     worldId?: string;
+    key?: string;
   };
 }
