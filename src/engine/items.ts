@@ -1,9 +1,212 @@
-import type { RebirthItem } from './types';
+import type { RebirthItem, Stats, GameHistory } from './types';
 
 /**
  * Rebirth Items — 转生道具系统
  * 道具可以影响转生到特定世界的概率，或提供初始属性加成
  */
+
+/** 道具掉落率配置 */
+export const LOOT_RATES: Record<RebirthItem['rarity'], number> = {
+  common: 0.15,
+  rare: 0.05,
+  epic: 0.02,
+  legendary: 0.005,
+};
+
+/** 临时道具 — 游戏内一次性效果 */
+export interface TempItem extends RebirthItem {
+  /** 使用后立即生效的属性变化 */
+  instantEffects: Partial<Stats>;
+}
+
+export const tempItemPool: TempItem[] = [
+  {
+    id: 'temp_heal_potion',
+    name: '疗伤药',
+    description: '一瓶普通的疗伤药，服用后恢复气血。',
+    rarity: 'common',
+    instantEffects: { health: 20 },
+  },
+  {
+    id: 'temp_strength_herb',
+    name: '力量草',
+    description: '一株散发着微光的草药，能短暂增强体质。',
+    rarity: 'common',
+    instantEffects: { strength: 10 },
+  },
+  {
+    id: 'temp_wisdom_scroll',
+    name: '智慧卷轴',
+    description: '记载着古老知识的卷轴，阅读后悟性提升。',
+    rarity: 'rare',
+    instantEffects: { intelligence: 15 },
+  },
+  {
+    id: 'temp_charm_perfume',
+    name: '魅惑香水',
+    description: '一瓶神秘的香水，使用后魅力大增。',
+    rarity: 'rare',
+    instantEffects: { charisma: 15 },
+  },
+  {
+    id: 'temp_luck_amulet',
+    name: '幸运护符',
+    description: '一个闪烁着金光的护符，能带来好运。',
+    rarity: 'epic',
+    instantEffects: { luck: 25, health: 10 },
+  },
+  {
+    id: 'temp_elixir',
+    name: '十全大补丹',
+    description: '传说中的丹药，能全面提升身体素质。',
+    rarity: 'epic',
+    instantEffects: { strength: 10, intelligence: 10, charisma: 10, health: 15 },
+  },
+  {
+    id: 'temp_phoenix_feather',
+    name: '凤凰羽',
+    description: '一根燃烧着火焰的羽毛，传闻能起死回生。',
+    rarity: 'legendary',
+    instantEffects: { health: 50, luck: 20, special: 10 },
+  },
+];
+
+/** 根据事件稀有度获取可能掉落的临时道具 */
+export function getTempDropsByRarity(eventRarity: 'common' | 'rare' | 'epic' | 'legendary'): TempItem[] {
+  const rarities: RebirthItem['rarity'][] =
+    eventRarity === 'legendary' ? ['common', 'rare', 'epic', 'legendary']
+      : eventRarity === 'epic' ? ['common', 'rare', 'epic']
+        : eventRarity === 'rare' ? ['common', 'rare']
+          : ['common'];
+  return tempItemPool.filter((item) => rarities.includes(item.rarity));
+}
+
+/** 尝试从事件中掉落临时道具 */
+export function tryDropTempItem(eventCategory: string): TempItem | null {
+  let rarity: 'common' | 'rare' | 'epic' | 'legendary' = 'common';
+  const roll = Math.random();
+
+  if (eventCategory === 'hidden' || eventCategory === 'death') {
+    if (roll < LOOT_RATES.legendary) rarity = 'legendary';
+    else if (roll < LOOT_RATES.epic) rarity = 'epic';
+    else if (roll < LOOT_RATES.rare) rarity = 'rare';
+  } else if (eventCategory === 'combat' || eventCategory === 'cultivation') {
+    if (roll < LOOT_RATES.epic) rarity = 'epic';
+    else if (roll < LOOT_RATES.rare) rarity = 'rare';
+  } else if (eventCategory === 'romance' || eventCategory === 'exploration') {
+    if (roll < LOOT_RATES.rare) rarity = 'rare';
+  }
+
+  const candidates = getTempDropsByRarity(rarity);
+  if (candidates.length === 0) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+/** 尝试从转生道具池中掉落一个道具 */
+export function tryDropRebirthItem(
+  existingInventory: RebirthItem[],
+  eventCategory: string
+): RebirthItem | null {
+  const roll = Math.random();
+  let threshold = LOOT_RATES.common;
+
+  if (eventCategory === 'hidden') threshold = LOOT_RATES.epic;
+  else if (eventCategory === 'combat' || eventCategory === 'cultivation') threshold = LOOT_RATES.rare;
+  else if (eventCategory === 'romance' || eventCategory === 'exploration') threshold = LOOT_RATES.common + 0.05;
+
+  if (roll > threshold) return null;
+
+  const available = rebirthItems.filter((item) => !existingInventory.some((i) => i.id === item.id));
+  if (available.length === 0) return null;
+
+  // 按稀有度加权
+  const weights: Record<RebirthItem['rarity'], number> = {
+    common: 40,
+    rare: 30,
+    epic: 20,
+    legendary: 2,
+  };
+
+  const totalWeight = available.reduce((sum, item) => sum + weights[item.rarity], 0);
+  let randomWeight = Math.random() * totalWeight;
+
+  for (const item of available) {
+    randomWeight -= weights[item.rarity];
+    if (randomWeight <= 0) return item;
+  }
+
+  return available[available.length - 1] ?? null;
+}
+
+/** 应用临时道具效果 */
+export function applyTempItemEffects(stats: Stats, tempItem: TempItem): Stats {
+  const newStats = { ...stats };
+  for (const [key, val] of Object.entries(tempItem.instantEffects)) {
+    if (val !== undefined && key in newStats) {
+      (newStats as Record<string, number>)[key] = Math.max(0, Math.min(200, (newStats as Record<string, number>)[key] ?? 0) + val);
+    }
+  }
+  return newStats;
+}
+
+/** localStorage key */
+const HISTORY_KEY = 'isekai-game-history';
+
+/** 读取历史记录 */
+export function loadGameHistory(): GameHistory {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (raw) {
+      return JSON.parse(raw) as GameHistory;
+    }
+  } catch {
+    // ignore
+  }
+  return {
+    bestAge: 0,
+    bestRealm: 0,
+    totalEvents: 0,
+    endingsUnlocked: [],
+    bestStats: { strength: 0, intelligence: 0, charisma: 0, luck: 0, health: 0, special: 0 },
+    totalPlaythroughs: 0,
+    totalItemsFound: 0,
+  };
+}
+
+/** 保存历史记录 */
+export function saveGameHistory(history: GameHistory) {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // ignore
+  }
+}
+
+/** 更新历史记录（与本次游戏对比并更新） */
+export function updateGameHistory(
+  state: { age: number; realm: number; stats: Stats; eventHistory: { length: number }; ending: { id: string } | null; obtainedItems: string[] }
+) {
+  const history = loadGameHistory();
+
+  history.bestAge = Math.max(history.bestAge, state.age);
+  history.bestRealm = Math.max(history.bestRealm, state.realm);
+  history.totalEvents = Math.max(history.totalEvents, state.eventHistory.length);
+  history.totalPlaythroughs += 1;
+  history.totalItemsFound += state.obtainedItems.length;
+
+  // Update best stats
+  for (const key of Object.keys(state.stats) as (keyof Stats)[]) {
+    history.bestStats[key] = Math.max(history.bestStats[key] ?? 0, state.stats[key]);
+  }
+
+  // Track unlocked endings
+  if (state.ending && !history.endingsUnlocked.includes(state.ending.id)) {
+    history.endingsUnlocked.push(state.ending.id);
+  }
+
+  saveGameHistory(history);
+  return history;
+}
 
 export const rebirthItems: RebirthItem[] = [
   // ── Common (普通) ──

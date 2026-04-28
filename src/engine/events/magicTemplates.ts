@@ -680,8 +680,8 @@ export const magicTemplates: EventTemplate[] = [
       '你面临抉择：学院愿意收你为正式教授，但要求你放弃奥术数学研究、回归正统元素魔法；或者继续你的研究，但会被整个魔法界排斥。',
     ],
     choices: [
-      { text: '坚持奥术数学', successRate: 0.55, successText: '你选择了坚持奥术数学，从此踏上了一条不归路。', failText: '你选择了坚持奥术数学，但命运弄人，一切并未如你所愿。', effects: { charisma: 10, health: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_apprentice_path'], failFlags: ['branch_identity_apprentice_path_fail'] },
-      { text: '回归正统魔法', successRate: 0.75, successText: '你选择了回归正统魔法，虽然道路不同，但终点未必更差。', failText: '你选择了回归正统魔法，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_apprentice_new'], failFlags: ['branch_identity_apprentice_new_fail'] },
+      { text: '坚持奥术数学', successRate: 0.55, successText: '你选择了坚持奥术数学，从此踏上了一条不归路。', failText: '你选择了坚持奥术数学，但命运弄人，一切并未如你所愿。', effects: { charisma: 10, health: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_apprentice_path'], failFlags: ['branch_identity_apprentice_path_fail'], relationshipEffects: { 'archmage': 10 } },
+      { text: '回归正统魔法', successRate: 0.75, successText: '你选择了回归正统魔法，虽然道路不同，但终点未必更差。', failText: '你选择了回归正统魔法，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_apprentice_new'], failFlags: ['branch_identity_apprentice_new_fail'], relationshipEffects: { 'dragon_elders': 10 } },
     ],
     flags: ['chain_apprentice_adult_1'],
     requiredFlags: ['chain_apprentice_growth_0'],
@@ -774,8 +774,8 @@ export const magicTemplates: EventTemplate[] = [
       '你面临抉择：支持父亲，用魔法消灭叔叔，继承家主之位；或者支持叔叔，揭发家族的黑暗历史，但会失去一切。',
     ],
     choices: [
-      { text: '支持父亲', successRate: 0.5, successText: '你选择了支持父亲，从此踏上了一条不归路。', failText: '你选择了支持父亲，但命运弄人，一切并未如你所愿。', effects: { intelligence: 10, luck: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_noble_mage_path'], failFlags: ['branch_identity_noble_mage_path_fail'] },
-      { text: '支持叔叔', successRate: 0.75, successText: '你选择了支持叔叔，虽然道路不同，但终点未必更差。', failText: '你选择了支持叔叔，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_noble_mage_new'], failFlags: ['branch_identity_noble_mage_new_fail'] },
+      { text: '支持父亲', successRate: 0.5, successText: '你选择了支持父亲，从此踏上了一条不归路。', failText: '你选择了支持父亲，但命运弄人，一切并未如你所愿。', effects: { intelligence: 10, luck: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_noble_mage_path'], failFlags: ['branch_identity_noble_mage_path_fail'], relationshipEffects: { 'dark_lord': 10 } },
+      { text: '支持叔叔', successRate: 0.75, successText: '你选择了支持叔叔，虽然道路不同，但终点未必更差。', failText: '你选择了支持叔叔，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_noble_mage_new'], failFlags: ['branch_identity_noble_mage_new_fail'], relationshipEffects: { 'archmage': 10 } },
     ],
     flags: ['chain_noble_mage_adult_1'],
     requiredFlags: ['chain_noble_mage_growth_0'],
@@ -868,8 +868,8 @@ export const magicTemplates: EventTemplate[] = [
       '你可以选择：彻底回归自然，放弃人类身份，获得强大的自然之力但失去人类社会的一切；或者保持人形，在人类和精灵之间做桥梁。',
     ],
     choices: [
-      { text: '回归自然', successRate: 0.5, successText: '你选择了回归自然，从此踏上了一条不归路。', failText: '你选择了回归自然，但命运弄人，一切并未如你所愿。', effects: { charisma: 10, health: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_druid_path'], failFlags: ['branch_identity_druid_path_fail'] },
-      { text: '保持人形', successRate: 0.75, successText: '你选择了保持人形，虽然道路不同，但终点未必更差。', failText: '你选择了保持人形，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_druid_new'], failFlags: ['branch_identity_druid_new_fail'] },
+      { text: '回归自然', successRate: 0.5, successText: '你选择了回归自然，从此踏上了一条不归路。', failText: '你选择了回归自然，但命运弄人，一切并未如你所愿。', effects: { charisma: 10, health: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_druid_path'], failFlags: ['branch_identity_druid_path_fail'], relationshipEffects: { 'dragon_elders': 10 } },
+      { text: '保持人形', successRate: 0.75, successText: '你选择了保持人形，虽然道路不同，但终点未必更差。', failText: '你选择了保持人形，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_druid_new'], failFlags: ['branch_identity_druid_new_fail'], relationshipEffects: { 'elf_princess': 10 } },
     ],
     flags: ['chain_druid_adult_1'],
     requiredFlags: ['chain_druid_growth_0'],

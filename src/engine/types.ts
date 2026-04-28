@@ -53,6 +53,9 @@ export interface NPC {
   name: string;
   type: 'romance' | 'mentor' | 'rival';
   description: string;
+  avatar?: string;
+  introEvent?: string;
+  maxRelationshipEvents?: string[];
 }
 
 export type EventEffects = Partial<Stats> & { realm?: number; maxAge?: number };
@@ -71,16 +74,29 @@ export interface Event {
     failText?: string;
     successRate?: number;
     failEffects?: EventEffects;
+    relationshipEffects?: Record<string, number>;
+    failRelationshipEffects?: Record<string, number>;
+    failFlags?: string[];
     flags?: string[];
     nextEventId?: string;
+    /** 选择成功时奖励的转生道具ID */
+    rewardItem?: string;
+    /** 选择成功时获得的临时道具效果（一次性） */
+    tempEffects?: EventEffects;
   }[];
   effects?: EventEffects;
+  relationshipEffects?: Record<string, number>;
+  requiredRelationship?: Record<string, number>;
   conditions?: { stat: string; min?: number; max?: number }[];
   flags?: string[];
   requiredFlags?: string[];
   probability: number;
   isChain?: boolean;
   chainEventId?: string;
+  /** 事件触发时奖励的转生道具ID（用于无选择事件） */
+  rewardItem?: string;
+  /** 事件触发时获得的临时道具效果（一次性） */
+  tempEffects?: EventEffects;
 }
 
 export interface Ending {
@@ -181,6 +197,7 @@ export interface GameState {
   stats: Stats;
   talentLevel: TalentLevel;
   relationships: Record<string, number>;
+  relationshipEventCount: number;
   flags: string[];
   eventHistory: { age: number; text: string; effects: Partial<Stats> }[];
   currentEvent: Event | null;
@@ -191,4 +208,29 @@ export interface GameState {
   inventory: RebirthItem[];
   equippedItems: string[];
   totalRebirths: number;
+  /** 游戏中获得的临时道具（一次性使用） */
+  tempItems: RebirthItem[];
+  /** 本局获得的道具记录（用于结算展示） */
+  obtainedItems: string[];
+  /** 本局做出的选择统计 */
+  choiceStats: { total: number; success: number; fail: number };
+  /** 本局战斗/恋爱/隐藏事件计数 */
+  eventCounters: { combat: number; romance: number; hidden: number };
+  /** 本局所有事件类别计数（成就系统用） */
+  eventCategoryCounts: Record<string, number>;
+  /** 在死亡事件中成功生还的次数 */
+  deathSurvivedCount: number;
+  /** 起始属性（用于检测起始属性相关的成就） */
+  startingStats: Stats;
+}
+
+/** 跨局历史记录 */
+export interface GameHistory {
+  bestAge: number;
+  bestRealm: number;
+  totalEvents: number;
+  endingsUnlocked: string[];
+  bestStats: Stats;
+  totalPlaythroughs: number;
+  totalItemsFound: number;
 }

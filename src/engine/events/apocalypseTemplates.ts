@@ -772,8 +772,8 @@ export const apocalypseTemplates: EventTemplate[] = [
       '你可以选择：留在避难所，争取成为下一任管理者，维持现有的秩序；或者带领一批志同道合者离开，去地表建立新的家园。',
     ],
     choices: [
-      { text: '留在避难所', successRate: 1, successText: '你选择了留在避难所，从此踏上了一条不归路。', failText: '你选择了留在避难所，但命运弄人，一切并未如你所愿。', effects: { charisma: 10, health: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_shelter_path'], failFlags: ['branch_identity_shelter_path_fail'] },
-      { text: '重返地表', successRate: 1, successText: '你选择了重返地表，虽然道路不同，但终点未必更差。', failText: '你选择了重返地表，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_shelter_new'], failFlags: ['branch_identity_shelter_new_fail'] },
+      { text: '留在避难所', successRate: 1, successText: '你选择了留在避难所，从此踏上了一条不归路。', failText: '你选择了留在避难所，但命运弄人，一切并未如你所愿。', effects: { charisma: 10, health: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_shelter_path'], failFlags: ['branch_identity_shelter_path_fail'], relationshipEffects: { 'prophet': 10 } },
+      { text: '重返地表', successRate: 1, successText: '你选择了重返地表，虽然道路不同，但终点未必更差。', failText: '你选择了重返地表，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_shelter_new'], failFlags: ['branch_identity_shelter_new_fail'], relationshipEffects: { 'veteran': 10 } },
     ],
     flags: ['chain_shelter_adult_1'],
     requiredFlags: ['chain_shelter_growth_0'],
@@ -866,8 +866,8 @@ export const apocalypseTemplates: EventTemplate[] = [
       '你可以选择：镇压反对派，以暴力维持统治，成为废土最令人恐惧的暴君；或者改变帮派的路线，从掠夺者转型为守护者。',
     ],
     choices: [
-      { text: '暴力统治', successRate: 1, successText: '你选择了暴力统治，从此踏上了一条不归路。', failText: '你选择了暴力统治，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_raider_path'], failFlags: ['branch_identity_raider_path_fail'] },
-      { text: '转型守护者', successRate: 1, successText: '你选择了转型守护者，虽然道路不同，但终点未必更差。', failText: '你选择了转型守护者，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_raider_new'], failFlags: ['branch_identity_raider_new_fail'] },
+      { text: '暴力统治', successRate: 1, successText: '你选择了暴力统治，从此踏上了一条不归路。', failText: '你选择了暴力统治，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_raider_path'], failFlags: ['branch_identity_raider_path_fail'], relationshipEffects: { 'warlord': 10 } },
+      { text: '转型守护者', successRate: 1, successText: '你选择了转型守护者，虽然道路不同，但终点未必更差。', failText: '你选择了转型守护者，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_raider_new'], failFlags: ['branch_identity_raider_new_fail'], relationshipEffects: { 'doctor': 10 } },
     ],
     flags: ['chain_raider_adult_1'],
     requiredFlags: ['chain_raider_growth_0'],
@@ -960,8 +960,8 @@ export const apocalypseTemplates: EventTemplate[] = [
       '你可以选择：彻底释放变异潜能，获得毁天灭地的力量，但会逐渐丧失自我意识；或者压制变异，保持人性，但永远达不到进化的巅峰。',
     ],
     choices: [
-      { text: '彻底进化', successRate: 1, successText: '你选择了彻底进化，从此踏上了一条不归路。', failText: '你选择了彻底进化，但命运弄人，一切并未如你所愿。', effects: { intelligence: 10, luck: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_mutant_path'], failFlags: ['branch_identity_mutant_path_fail'] },
-      { text: '保持人性', successRate: 1, successText: '你选择了保持人性，虽然道路不同，但终点未必更差。', failText: '你选择了保持人性，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_mutant_new'], failFlags: ['branch_identity_mutant_new_fail'] },
+      { text: '彻底进化', successRate: 1, successText: '你选择了彻底进化，从此踏上了一条不归路。', failText: '你选择了彻底进化，但命运弄人，一切并未如你所愿。', effects: { intelligence: 10, luck: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_mutant_path'], failFlags: ['branch_identity_mutant_path_fail'], relationshipEffects: { 'warlord': 10 } },
+      { text: '保持人性', successRate: 1, successText: '你选择了保持人性，虽然道路不同，但终点未必更差。', failText: '你选择了保持人性，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_mutant_new'], failFlags: ['branch_identity_mutant_new_fail'], relationshipEffects: { 'doctor': 10 } },
     ],
     flags: ['chain_mutant_adult_1'],
     requiredFlags: ['chain_mutant_growth_0'],

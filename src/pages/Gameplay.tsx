@@ -138,7 +138,7 @@ function TopBar({
   health,
   maxHealth,
   statHealthName,
-  realm,
+  realm: _realm,
   realmName,
   autoPlay,
   setAutoPlay,
@@ -253,11 +253,13 @@ function TopBar({
 function RelationshipPanel({
   relationships,
   npcs,
-  themeColor,
+  themeColor: _themeColor,
+  relationshipEventCount,
 }: {
   relationships: Record<string, number>;
-  npcs: { id: string; name: string; type: string }[];
+  npcs: { id: string; name: string; type: string; avatar?: string }[];
   themeColor: string;
+  relationshipEventCount: number;
 }) {
   const relEntries = Object.entries(relationships)
     .filter(([, val]) => val !== 0)
@@ -270,6 +272,31 @@ function RelationshipPanel({
     if (v >= 0) return '相识';
     return '陌生';
   };
+
+  const relColor = (v: number) => {
+    if (v >= 80) return '#FF6B6B';
+    if (v >= 50) return '#9B6BFF';
+    if (v >= 20) return '#2DD4A0';
+    if (v >= 0) return '#4B8AC8';
+    return '#666';
+  };
+
+  const npcTypeLabel = (type: string) => {
+    if (type === 'romance') return '恋人';
+    if (type === 'mentor') return '导师';
+    if (type === 'rival') return '对手';
+    return type;
+  };
+
+  const npcTypeColor = (type: string) => {
+    if (type === 'romance') return '#FF6B6B';
+    if (type === 'mentor') return '#4B8AC8';
+    if (type === 'rival') return '#FF6B2D';
+    return '#666';
+  };
+
+  const highest = relEntries[0];
+  const highestNPC = highest ? npcs.find((n) => n.id === highest[0]) : undefined;
 
   return (
     <motion.div
@@ -290,6 +317,7 @@ function RelationshipPanel({
               const npc = npcs.find((n) => n.id === npcId);
               if (!npc) return null;
               const pct = Math.max(0, Math.min(100, ((val + 100) / 200) * 100));
+              const color = relColor(val);
               return (
                 <motion.div
                   key={npcId}
@@ -297,19 +325,29 @@ function RelationshipPanel({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-lg">{npc.avatar ?? (npc.type === 'romance' ? '💕' : npc.type === 'mentor' ? '👤' : '⚔')}</span>
                     <span className="text-sm font-bold font-body text-text-primary">{npc.name}</span>
-                    <span className="text-[11px] font-body text-text-secondary">
-                      {npc.type === 'romance' ? '💕' : npc.type === 'mentor' ? '👤' : '⚔'}
+                    <span
+                      className="text-[11px] font-body font-bold px-1.5 py-0.5 rounded"
+                      style={{ backgroundColor: `${npcTypeColor(npc.type)}20`, color: npcTypeColor(npc.type) }}
+                    >
+                      {npcTypeLabel(npc.type)}
+                    </span>
+                    <span
+                      className="text-[11px] font-body font-bold px-1.5 py-0.5 rounded"
+                      style={{ backgroundColor: `${color}20`, color }}
+                    >
+                      {relLabel(val)}
                     </span>
                   </div>
-                  <div className="w-full h-1.5 bg-bg-tertiary rounded-full overflow-hidden mb-1">
+                  <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden mb-1">
                     <div
                       className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${pct}%`, backgroundColor: themeColor }}
+                      style={{ width: `${pct}%`, backgroundColor: color }}
                     />
                   </div>
-                  <span className="text-[11px] font-body text-text-secondary">{relLabel(val)}</span>
+                  <span className="text-[11px] font-body text-text-secondary">{val > 0 ? '+' : ''}{val}</span>
                 </motion.div>
               );
             })}
@@ -326,6 +364,16 @@ function RelationshipPanel({
             <span className="font-body text-text-secondary">遇到人物</span>
             <span className="font-mono text-text-primary">{relEntries.length}</span>
           </div>
+          <div className="flex justify-between text-xs">
+            <span className="font-body text-text-secondary">最高好感度</span>
+            <span className="font-mono text-text-primary">
+              {highestNPC ? `${highestNPC.name} (${highest ? highest[1] : 0})` : '无'}
+            </span>
+          </div>
+          <div className="flex justify-between text-xs">
+            <span className="font-body text-text-secondary">羁绊事件</span>
+            <span className="font-mono text-text-primary">{relationshipEventCount}</span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -336,7 +384,7 @@ function RelationshipPanel({
 
 export default function Gameplay() {
   const navigate = useNavigate();
-  const { state, advanceYear, selectChoice, updateStats, setEvent, addFlags } = useGameContext();
+  const { state, advanceYear, selectChoice, updateStats, setEvent, addFlags, recordEventCategory } = useGameContext();
 
   const [eventHistory, setEventHistory] = useState<Array<{ age: number; text: string; effects: EventEffects; flags?: string[]; choices?: { text: string; effects: EventEffects; successText?: string; failText?: string; successRate?: number; failEffects?: EventEffects; flags?: string[] }[]; choiceMade?: number }>>([]);
   const [currentEvent, setCurrentEvent] = useState<{ age: number; text: string; effects: EventEffects; flags?: string[]; choices?: { text: string; effects: EventEffects; successText?: string; failText?: string; successRate?: number; failEffects?: EventEffects; flags?: string[] }[] } | null>(null);
@@ -401,6 +449,7 @@ export default function Gameplay() {
       setCurrentEvent(birthEvent);
       setTypingComplete(false);
       setEventHistory([{ ...birthEvent }]);
+      recordEventCategory('childhood');
     }
   }, [state.isPlaying, state.age, eventHistory.length, world, identity]);
 
@@ -489,7 +538,7 @@ export default function Gameplay() {
     }
 
     if (shouldDie) {
-      const available = getAvailableEvents(worldId, newAge, state.stats, state.flags, identityId, state.talentLevel);
+      const available = getAvailableEvents(worldId, newAge, state.stats, state.flags, identityId, state.talentLevel, state.relationships);
       const deathEvents = available.filter((e) => e.category === 'death');
       const picked = deathEvents.length > 0 ? pickEvent(deathEvents) : null;
       const deathEvent = {
@@ -500,6 +549,7 @@ export default function Gameplay() {
       };
       setCurrentEvent(deathEvent);
       setEventHistory((prev) => [...prev, { ...deathEvent }]);
+      recordEventCategory('death');
       if (picked?.flags) addFlags(picked.flags);
       setIsDying(true);
       setIsProcessing(false);
@@ -511,7 +561,7 @@ export default function Gameplay() {
     }
 
     // generate random event from template system based on current world
-    const available = getAvailableEvents(worldId, newAge, state.stats, state.flags, identityId, state.talentLevel);
+    const available = getAvailableEvents(worldId, newAge, state.stats, state.flags, identityId, state.talentLevel, state.relationships);
     const normalEvents = available.filter((e) => e.category !== 'death');
     const picked = pickEvent(normalEvents);
 
@@ -528,6 +578,8 @@ export default function Gameplay() {
           failText: c.failText,
           successRate: c.successRate,
           failEffects: c.failEffects,
+          relationshipEffects: c.relationshipEffects,
+          failRelationshipEffects: c.failRelationshipEffects,
           flags: c.flags,
         })),
       };
@@ -547,6 +599,8 @@ export default function Gameplay() {
         effects: picked.effects,
         flags: picked.flags,
         probability: picked.probability,
+        rewardItem: picked.rewardItem,
+        tempEffects: picked.tempEffects,
       });
 
       // Note: passive effects for non-choice events are applied in the
@@ -617,8 +671,8 @@ export default function Gameplay() {
 
       // Add choice result flags to global state for story branching
       if (result?.success !== undefined) {
-        const flagPrefix = result.success ? 'choice_success' : 'choice_fail';
-        const eventFlag = `${flagPrefix}_${currentEvent.age}_${choiceIndex}`;
+        // const flagPrefix = result.success ? 'choice_success' : 'choice_fail';
+        // const eventFlag = `${flagPrefix}_${currentEvent.age}_${choiceIndex}`;
         // We can't easily update state.flags here without a setter,
         // but the flags from choice are already handled by selectChoice in useGame
       }
@@ -911,6 +965,7 @@ export default function Gameplay() {
           relationships={state.relationships}
           npcs={world.npcs}
           themeColor={themeColor}
+          relationshipEventCount={state.relationshipEventCount}
         />
       </div>
 

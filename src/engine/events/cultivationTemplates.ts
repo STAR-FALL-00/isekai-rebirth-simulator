@@ -752,8 +752,8 @@ export const cultivationTemplates: EventTemplate[] = [
       '成年后的你面临抉择：青云宗长老欣赏你的毅力，愿收你为真传，但要求你放弃体修、转修正统功法；或者继续体修，但永远得不到宗门核心资源。',
     ],
     choices: [
-      { text: '坚持体修', successRate: 0.6, successText: '你选择了坚持体修，从此踏上了一条不归路。', failText: '你选择了坚持体修，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_commoner_path'], failFlags: ['branch_identity_commoner_path_fail'] },
-      { text: '转修正统', successRate: 0.75, successText: '你选择了转修正统，虽然道路不同，但终点未必更差。', failText: '你选择了转修正统，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_commoner_new'], failFlags: ['branch_identity_commoner_new_fail'] },
+      { text: '坚持体修', successRate: 0.6, successText: '你选择了坚持体修，从此踏上了一条不归路。', failText: '你选择了坚持体修，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_commoner_path'], failFlags: ['branch_identity_commoner_path_fail'], relationshipEffects: { 'elder_yun': 10 } },
+      { text: '转修正统', successRate: 0.75, successText: '你选择了转修正统，虽然道路不同，但终点未必更差。', failText: '你选择了转修正统，却发现这条路比你想象的更加艰难。', effects: { luck: 8, charisma: 5 }, failEffects: { strength: -3 }, flags: ['branch_identity_commoner_new'], failFlags: ['branch_identity_commoner_new_fail'], relationshipEffects: { 'alchemy_master': 10 } },
     ],
     flags: ['chain_commoner_adult_1'],
     requiredFlags: ['chain_commoner_growth_0'],
@@ -846,8 +846,8 @@ export const cultivationTemplates: EventTemplate[] = [
       '你发现大师兄与魔道交易的事实。现在你有两个选择：向掌门举报，但可能被视为诬陷；或者暂时隐忍，寻找更多证据。',
     ],
     choices: [
-      { text: '举报大师兄', successRate: 0.55, successText: '你选择了举报大师兄，从此踏上了一条不归路。', failText: '你选择了举报大师兄，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_genius_path'], failFlags: ['branch_identity_genius_path_fail'] },
-      { text: '隐忍收集证据', successRate: 0.75, successText: '你选择了隐忍收集证据，虽然道路不同，但终点未必更差。', failText: '你选择了隐忍收集证据，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_genius_new'], failFlags: ['branch_identity_genius_new_fail'] },
+      { text: '举报大师兄', successRate: 0.55, successText: '你选择了举报大师兄，从此踏上了一条不归路。', failText: '你选择了举报大师兄，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_genius_path'], failFlags: ['branch_identity_genius_path_fail'], relationshipEffects: { 'elder_yun': 5 } },
+      { text: '隐忍收集证据', successRate: 0.75, successText: '你选择了隐忍收集证据，虽然道路不同，但终点未必更差。', failText: '你选择了隐忍收集证据，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_genius_new'], failFlags: ['branch_identity_genius_new_fail'], relationshipEffects: { 'elder_yun': 10 } },
     ],
     flags: ['chain_genius_adult_1'],
     requiredFlags: ['chain_genius_growth_0'],
@@ -940,8 +940,8 @@ export const cultivationTemplates: EventTemplate[] = [
       '大宗门给了最后通牒：要么加入宗门，要么被剿灭。散修联盟内部也出现了分歧——有人主张投降，有人主张死战。',
     ],
     choices: [
-      { text: '领导起义', successRate: 0.5, successText: '你选择了领导起义，从此踏上了一条不归路。', failText: '你选择了领导起义，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_wanderer_path'], failFlags: ['branch_identity_wanderer_path_fail'] },
-      { text: '谈判妥协', successRate: 0.75, successText: '你选择了谈判妥协，虽然道路不同，但终点未必更差。', failText: '你选择了谈判妥协，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_wanderer_new'], failFlags: ['branch_identity_wanderer_new_fail'] },
+      { text: '领导起义', successRate: 0.5, successText: '你选择了领导起义，从此踏上了一条不归路。', failText: '你选择了领导起义，但命运弄人，一切并未如你所愿。', effects: { strength: 10, special: 5 }, failEffects: { health: -10, luck: -5 }, flags: ['branch_identity_wanderer_path'], failFlags: ['branch_identity_wanderer_path_fail'], relationshipEffects: { 'demon_lord': 10 } },
+      { text: '谈判妥协', successRate: 0.75, successText: '你选择了谈判妥协，虽然道路不同，但终点未必更差。', failText: '你选择了谈判妥协，却发现这条路比你想象的更加艰难。', effects: { intelligence: 8, special: 3 }, failEffects: { strength: -3 }, flags: ['branch_identity_wanderer_new'], failFlags: ['branch_identity_wanderer_new_fail'], relationshipEffects: { 'elder_yun': 10 } },
     ],
     flags: ['chain_wanderer_adult_1'],
     requiredFlags: ['chain_wanderer_growth_0'],

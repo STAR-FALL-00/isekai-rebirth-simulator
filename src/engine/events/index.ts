@@ -18,6 +18,70 @@ const worldTemplates: Record<string, EventTemplate[]> = {
   wuxia: wuxiaTemplates,
 };
 
+// Auto-map identity-exclusive events to a romance NPC for default relationship effects
+const IDENTITY_ROMANCE_MAP: Record<string, Record<string, string>> = {
+  cultivation: {
+    genius: 'fairy_ling',
+    commoner: 'twin_spirit',
+    wanderer: 'fairy_ling',
+    demon_blood: 'beast_emperor',
+    demon_heritage: 'demon_lord',
+    reincarnated: 'fairy_ling',
+    spirit_body: 'twin_spirit',
+    artifact_spirit: 'fairy_ling',
+    buddhist: 'fairy_ling',
+    ghost_cultivator: 'twin_spirit',
+  },
+  magic: {
+    noble_mage: 'elf_princess',
+    apprentice: 'fairy_queen',
+    druid: 'fairy_queen',
+    assassin: 'witch',
+    paladin: 'elf_princess',
+    dragon_blood: 'fairy_queen',
+    necromancer: 'witch',
+    summoner: 'fairy_queen',
+    alchemist: 'elf_princess',
+    battle_mage: 'witch',
+  },
+  scifi: {
+    space_noble: 'ai_companion',
+    colonist: 'engineer',
+    cyborg: 'engineer',
+    alien_hybrid: 'ai_companion',
+    ai_awakened: 'ai_companion',
+    time_traveler: 'engineer',
+    gene_warrior: 'engineer',
+    pirate: 'engineer',
+    archaeologist: 'ai_companion',
+    hacker: 'ai_companion',
+  },
+  apocalypse: {
+    shelter: 'doctor',
+    raider: 'scavenger',
+    mutant: 'scavenger',
+    scientist: 'doctor',
+    mechanic: 'scavenger',
+    new_human: 'doctor',
+    doctor: 'doctor',
+    scavenger: 'scavenger',
+    preacher: 'doctor',
+    beast_tamer: 'scavenger',
+  },
+  wuxia: {
+    farmers_son: 'sword_fairy',
+    aristocrat: 'poison_girl',
+    orphan: 'sword_fairy',
+    demon_disciple: 'poison_girl',
+    spy: 'sword_fairy',
+    foreigner: 'poison_girl',
+    medic: 'poison_girl',
+    poisoner: 'poison_girl',
+    swordsman: 'sword_fairy',
+    assassin_wuxia: 'poison_girl',
+  },
+};
+
 // Word banks for template interpolation
 const wordBanks: Record<string, Record<string, string[]>> = {
   cultivation: {
@@ -74,6 +138,15 @@ function interpolateTemplate(text: string, worldId: string): string {
 // Expand a template into multiple GameEvents
 function expandTemplate(worldId: string, template: EventTemplate): GameEvent[] {
   const events: GameEvent[] = [];
+  const defaultRelEffects = (() => {
+    if (!template.identityExclusive) return undefined;
+    const map = IDENTITY_ROMANCE_MAP[worldId];
+    if (!map) return undefined;
+    const npcId = map[template.identityExclusive];
+    if (!npcId) return undefined;
+    return { [npcId]: 5 };
+  })();
+
   for (const [index, tmpl] of template.templates.entries()) {
     const text = interpolateTemplate(tmpl, worldId);
     events.push({
@@ -84,6 +157,8 @@ function expandTemplate(worldId: string, template: EventTemplate): GameEvent[] {
       text,
       choices: template.choices,
       effects: template.effects,
+      relationshipEffects: template.relationshipEffects ?? defaultRelEffects,
+      requiredRelationship: template.requiredRelationship,
       conditions: template.conditions,
       requiredFlags: template.requiredFlags,
       flags: template.flags,
@@ -91,6 +166,8 @@ function expandTemplate(worldId: string, template: EventTemplate): GameEvent[] {
       identityExclusive: template.identityExclusive,
       talentExclusive: template.talentExclusive,
       chainPriority: template.chainPriority,
+      rewardItem: template.rewardItem,
+      tempEffects: template.tempEffects,
     });
   }
   return events;
@@ -121,7 +198,8 @@ export function getAvailableEvents(
   stats: Stats,
   flags: string[],
   identityId: string,
-  talentLevel?: string
+  talentLevel?: string,
+  relationships?: Record<string, number>
 ): GameEvent[] {
   const templates = worldTemplates[worldId] ?? [];
   const available: GameEvent[] = [];
@@ -161,6 +239,18 @@ export function getAvailableEvents(
         const val = stats[cond.stat] ?? 0;
         if (cond.min !== undefined && val < cond.min) { pass = false; break; }
         if (cond.max !== undefined && val > cond.max) { pass = false; break; }
+      }
+      if (!pass) continue;
+    }
+
+    // Check relationship conditions
+    if (template.requiredRelationship && relationships) {
+      let pass = true;
+      for (const [npcId, minVal] of Object.entries(template.requiredRelationship)) {
+        if ((relationships[npcId] ?? 0) < minVal) {
+          pass = false;
+          break;
+        }
       }
       if (!pass) continue;
     }
@@ -232,6 +322,8 @@ export function processChoice(choice: EventChoice): {
   text: string;
   effects: EventEffects;
   flags?: string[];
+  rewardItem?: string;
+  tempEffects?: EventEffects;
 } {
   const roll = Math.random();
   const success = roll <= choice.successRate;
@@ -241,6 +333,8 @@ export function processChoice(choice: EventChoice): {
     text: success ? choice.successText : choice.failText,
     effects: success ? choice.effects : (choice.failEffects ?? choice.effects),
     flags: choice.flags,
+    rewardItem: success ? choice.rewardItem : undefined,
+    tempEffects: success ? choice.tempEffects : undefined,
   };
 }
 

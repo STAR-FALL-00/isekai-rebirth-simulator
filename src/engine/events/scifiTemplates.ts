@@ -728,8 +728,8 @@ export const scifiTemplates: EventTemplate[] = [
       '',
     ],
     choices: [
-      { text: '拒绝迁移，抗争到底', successRate: 1, successText: '你选择了拒绝迁移，抗争到底，走上了属于自己的道路', failText: '你选择了拒绝迁移，抗争到底，但前路比想象中更加艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_colonist_path'], failFlags: ['branch_identity_colonist_path_fail'] },
-      { text: '接受条件，保全同胞', successRate: 1, successText: '你选择了接受条件，保全同胞，开启了一段全新的旅程', failText: '你选择了接受条件，保全同胞，却发现代价远超预期', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_colonist_new'], failFlags: ['branch_identity_colonist_new_fail'] },
+      { text: '拒绝迁移，抗争到底', successRate: 1, successText: '你选择了拒绝迁移，抗争到底，走上了属于自己的道路', failText: '你选择了拒绝迁移，抗争到底，但前路比想象中更加艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_colonist_path'], failFlags: ['branch_identity_colonist_path_fail'], relationshipEffects: { 'captain': 10 } },
+      { text: '接受条件，保全同胞', successRate: 1, successText: '你选择了接受条件，保全同胞，开启了一段全新的旅程', failText: '你选择了接受条件，保全同胞，却发现代价远超预期', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_colonist_new'], failFlags: ['branch_identity_colonist_new_fail'], relationshipEffects: { 'captain': 5 } },
     ],
     flags: ['chain_colonist_adult_1'],
     requiredFlags: ['chain_colonist_growth_0'],
@@ -823,8 +823,8 @@ export const scifiTemplates: EventTemplate[] = [
       '',
     ],
     choices: [
-      { text: '公开真相，动摇联邦', successRate: 1, successText: '你选择了公开真相，动摇联邦，走上了属于自己的道路', failText: '你选择了公开真相，动摇联邦，但前路比想象中更加艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_space_noble_path'], failFlags: ['branch_identity_space_noble_path_fail'] },
-      { text: '暗中交易，保全家族', successRate: 1, successText: '你选择了暗中交易，保全家族，开启了一段全新的旅程', failText: '你选择了暗中交易，保全家族，却发现代价远超预期', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_space_noble_new'], failFlags: ['branch_identity_space_noble_new_fail'] },
+      { text: '公开真相，动摇联邦', successRate: 1, successText: '你选择了公开真相，动摇联邦，走上了属于自己的道路', failText: '你选择了公开真相，动摇联邦，但前路比想象中更加艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_space_noble_path'], failFlags: ['branch_identity_space_noble_path_fail'], relationshipEffects: { 'spy_master': 10 } },
+      { text: '暗中交易，保全家族', successRate: 1, successText: '你选择了暗中交易，保全家族，开启了一段全新的旅程', failText: '你选择了暗中交易，保全家族，却发现代价远超预期', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_space_noble_new'], failFlags: ['branch_identity_space_noble_new_fail'], relationshipEffects: { 'rebel_leader': 10 } },
     ],
     flags: ['chain_space_noble_adult_1'],
     requiredFlags: ['chain_space_noble_growth_0'],
@@ -918,8 +918,8 @@ export const scifiTemplates: EventTemplate[] = [
       '',
     ],
     choices: [
-      { text: '全面机械化', successRate: 1, successText: '你选择了全面机械化，走上了属于自己的道路', failText: '你选择了全面机械化，但前路比想象中更加艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_cyborg_path'], failFlags: ['branch_identity_cyborg_path_fail'] },
-      { text: '保留人性', successRate: 1, successText: '你选择了保留人性，开启了一段全新的旅程', failText: '你选择了保留人性，却发现代价远超预期', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_cyborg_new'], failFlags: ['branch_identity_cyborg_new_fail'] },
+      { text: '全面机械化', successRate: 1, successText: '你选择了全面机械化，走上了属于自己的道路', failText: '你选择了全面机械化，但前路比想象中更加艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_cyborg_path'], failFlags: ['branch_identity_cyborg_path_fail'], relationshipEffects: { 'captain': 5 } },
+      { text: '保留人性', successRate: 1, successText: '你选择了保留人性，开启了一段全新的旅程', failText: '你选择了保留人性，却发现代价远超预期', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_cyborg_new'], failFlags: ['branch_identity_cyborg_new_fail'], relationshipEffects: { 'engineer': 10 } },
     ],
     flags: ['chain_cyborg_adult_1'],
     requiredFlags: ['chain_cyborg_growth_0'],

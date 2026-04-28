@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, BookOpen, Trophy, Clock, Globe, User, Sparkles, Lock, ScrollText, FlaskConical } from 'lucide-react';
+import { RotateCcw, BookOpen, Trophy, Clock, Globe, User, Sparkles, Lock, ScrollText, FlaskConical, Package, TrendingUp, History, Target, Heart, Sword, Eye } from 'lucide-react';
 import { useGameContext } from '@/hooks/GameContext';
-import type { GameState, Stats } from '@/engine/types';
+import { useAchievements } from '@/hooks/useAchievements';
+import AchievementPopup from '@/components/AchievementPopup';
+import type { GameState, Stats, GameHistory } from '@/engine/types';
 import { WORLD_REALM_TABLES } from '@/engine/types';
+import { loadGameHistory, getRarityColor, getRarityLabel, rebirthItems } from '@/engine/items';
+import { achievements } from '@/engine/achievements';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -23,6 +27,20 @@ interface EndingDisplay {
   eventCount: number;
   unlockedAchievements: Achievement[];
   discoveredClues?: string[];
+  // 增强统计
+  realmName: string;
+  realmStage: number;
+  breakthroughCount: number;
+  combatEvents: number;
+  romanceEvents: number;
+  hiddenEvents: number;
+  choiceTotal: number;
+  choiceSuccess: number;
+  choiceFail: number;
+  npcMet: number;
+  highestBond: { name: string; value: number } | null;
+  itemsFound: number;
+  obtainedItemIds: string[];
 }
 
 interface Achievement {
@@ -36,7 +54,7 @@ interface Achievement {
 /* ------------------------------------------------------------------ */
 /*  Mock Data — Endings per world                                      */
 /* ------------------------------------------------------------------ */
-const allEndings: EndingDisplay[] = [
+const _allEndingsRaw: Omit<EndingDisplay, 'realmName' | 'realmStage' | 'breakthroughCount' | 'combatEvents' | 'romanceEvents' | 'hiddenEvents' | 'choiceTotal' | 'choiceSuccess' | 'choiceFail' | 'npcMet' | 'highestBond' | 'itemsFound' | 'obtainedItemIds'>[] = [
   /* ── 修仙界 (Cultivation) ── */
   {
     id: 'cult_good_01', title: '一代剑仙',
@@ -270,6 +288,23 @@ const allEndings: EndingDisplay[] = [
   },
 ];
 
+const allEndings: EndingDisplay[] = _allEndingsRaw.map((e) => ({
+  realmName: '',
+  realmStage: 0,
+  breakthroughCount: 0,
+  combatEvents: 0,
+  romanceEvents: 0,
+  hiddenEvents: 0,
+  choiceTotal: 0,
+  choiceSuccess: 0,
+  choiceFail: 0,
+  npcMet: 0,
+  highestBond: null,
+  itemsFound: 0,
+  obtainedItemIds: [],
+  ...e,
+}));
+
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
@@ -332,8 +367,40 @@ const WORLD_COLORS: Record<string, string> = {
   '古代武侠': '#FF2D55',
 };
 
+function getRelationshipLabel(val: number) {
+  if (val >= 80) return '恋人';
+  if (val >= 50) return '知己';
+  if (val >= 20) return '朋友';
+  if (val >= 0) return '相识';
+  return '陌生';
+}
+
+function getRelationshipColor(val: number) {
+  if (val >= 80) return '#FF4D6D';
+  if (val >= 50) return '#9B6BFF';
+  if (val >= 20) return '#4BC88A';
+  if (val >= 0) return '#00D4FF';
+  return '#8A8AB8';
+}
+
 function getSampleEnding(): EndingDisplay {
-  return allEndings[0]!;
+  const sample = allEndings[0]!;
+  return {
+    ...sample,
+    realmName: '未知境界',
+    realmStage: 0,
+    breakthroughCount: 0,
+    combatEvents: 0,
+    romanceEvents: 0,
+    hiddenEvents: 0,
+    choiceTotal: 0,
+    choiceSuccess: 0,
+    choiceFail: 0,
+    npcMet: 0,
+    highestBond: null,
+    itemsFound: 0,
+    obtainedItemIds: [],
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -364,7 +431,26 @@ function calculateEnding(state: GameState): EndingDisplay {
 
   // Death cause
   const diedByHealth = stats.health <= 0;
-  const diedByAge = age >= state.maxAge;
+  // const diedByAge = age >= state.maxAge;
+
+  // ── 增强统计 ──
+  // 突破次数：从eventHistory中统计realm增加的次数
+  let breakthroughCount = 0;
+  for (const evt of state.eventHistory) {
+    if (evt.effects && typeof (evt.effects as any).realm === 'number' && (evt.effects as any).realm > 0) {
+      breakthroughCount += (evt.effects as any).realm;
+    }
+  }
+
+  // NPC统计
+  const relEntries = Object.entries(state.relationships).filter(([, v]) => v !== 0);
+  const npcMet = relEntries.length;
+  const highestBondEntry = relEntries.length > 0
+    ? relEntries.reduce((a, b) => (a[1] > b[1] ? a : b))
+    : null;
+  const highestBond = highestBondEntry
+    ? { name: world?.npcs.find((n) => n.id === highestBondEntry[0])?.name ?? '未知', value: highestBondEntry[1] }
+    : null;
 
   let category: EndingCategory = 'normal';
   let title = '';
@@ -471,6 +557,83 @@ function calculateEnding(state: GameState): EndingDisplay {
     }
   }
 
+  // Relationship-based ending overrides
+  const romanceNPCs = world?.npcs?.filter((n) => n.type === 'romance') ?? [];
+  const allRomanceLovers = romanceNPCs.length > 0 && romanceNPCs.every((n) => {
+    const val = state.relationships[n.id] ?? 0;
+    return val >= 80;
+  });
+  const anyRomanceLover = romanceNPCs.some((n) => (state.relationships[n.id] ?? 0) >= 80);
+
+  if (allRomanceLovers) {
+    category = 'harem';
+    const haremData: Record<string, { title: string; description: string }> = {
+      cultivation: {
+        title: '三界之主的后宫',
+        description: '你不仅登临绝巅，更与仙、魔、妖三界绝美存在结下不解之缘。她们或守候在你的洞府，或远隔万里传讯，心中再无他人。',
+      },
+      magic: {
+        title: '元素使的羁绊',
+        description: '你与元素精灵使缔结了灵魂契约，从此你们心意相通，魔力共享。在你们的守护下，魔法大陆迎来了永恒的繁荣。',
+      },
+      scifi: {
+        title: '星际舰队的女王们',
+        description: '你麾下的七支星际舰队，每一支的指挥官都与你有着超越战友的情感。在星海的征途中，她们是你最坚实的后盾。',
+      },
+      apocalypse: {
+        title: '避难所的温暖',
+        description: '你的避难所收留了许多在废土上流浪的灵魂。在这个冰冷的世界里，她们的存在就是最大的温暖。',
+      },
+      wuxia: {
+        title: '桃花坞里桃花仙',
+        description: '江湖路远，刀剑如梦。你携手数位红颜知己，隐居桃花深处。每日论剑品茗，笑看风云变幻。',
+      },
+    };
+    const hd = haremData[worldId];
+    if (hd) {
+      title = hd.title;
+      description = hd.description;
+    }
+  } else if (anyRomanceLover && (category === 'normal' || category === 'good')) {
+    // Single romance bond ending
+    const bestRomance = romanceNPCs.reduce((best, n) => {
+      const bestVal = state.relationships[best.id] ?? 0;
+      const nVal = state.relationships[n.id] ?? 0;
+      return nVal > bestVal ? n : best;
+    }, romanceNPCs[0]!);
+
+    if (bestRomance) {
+      category = 'secret';
+      const bondData: Record<string, { title: string; description: string }> = {
+        cultivation: {
+          title: `${bestRomance.name}的道侣`,
+          description: `你历经${age}年苦修，虽未破碎虚空，但与${bestRomance.name}结下了超越生死的羁绊。在修仙这条孤独的道路上，你们互为道侣，互为灯塔。最终，你们选择在一处世外桃源隐居，不问世事，只问彼此。这份羁绊，比飞升更珍贵。`,
+        },
+        magic: {
+          title: `${bestRomance.name}的守护者`,
+          description: `你在魔法大陆探索了${age}年，虽未触及真理之塔的顶层，但与${bestRomance.name}的羁绊成为了你最强大的魔法。你们共同经历了无数冒险，在彼此的眼中看到了整个世界的倒影。最终，你们在元素位面的交界处建立了一座属于两个人的塔。`,
+        },
+        scifi: {
+          title: `${bestRomance.name}的星海之约`,
+          description: `你在银河系中航行了${age}年，虽未成为星神，但与${bestRomance.name}的羁绊跨越了星辰大海。在无数个光年之间，你们的心始终相连。最终，你们选择在一颗偏远的星球上定居，看着双恒星系统缓缓转动，直到时间的尽头。`,
+        },
+        apocalypse: {
+          title: `${bestRomance.name}的废土之光`,
+          description: `你在末日废土中挣扎求生了${age}年，虽未建立新的帝国，但与${bestRomance.name}的羁绊成为了废土上最温暖的光。在这个冰冷的世界里，你们互相取暖，互相支撑。最终，你们找到了一片未被辐射污染的绿洲，在那里种下了第一朵花。`,
+        },
+        wuxia: {
+          title: `${bestRomance.name}的江湖梦`,
+          description: `你在江湖中漂泊了${age}年，虽未破碎虚空，但与${bestRomance.name}的羁绊让你的剑有了温度。江湖路远，刀剑如梦，但你们知道，只要彼此在，江湖就在。最终，你们携手隐居桃花深处，每日论剑品茗，笑看风云变幻。`,
+        },
+      };
+      const bd = bondData[worldId];
+      if (bd) {
+        title = bd.title;
+        description = bd.description;
+      }
+    }
+  }
+
   // Age-based achievements
   if (age >= 500) {
     achievements.push({ id: 'ach_meta_01', name: '长生久视', description: '在任意世界存活超过500年', category: '特殊事件' });
@@ -496,6 +659,20 @@ function calculateEnding(state: GameState): EndingDisplay {
     highestStat: { name: highestStatName, value: highestStatValue },
     eventCount,
     unlockedAchievements: achievements,
+    // 增强统计
+    realmName,
+    realmStage: realm,
+    breakthroughCount,
+    combatEvents: state.eventCounters.combat,
+    romanceEvents: state.eventCounters.romance,
+    hiddenEvents: state.eventCounters.hidden,
+    choiceTotal: state.choiceStats.total,
+    choiceSuccess: state.choiceStats.success,
+    choiceFail: state.choiceStats.fail,
+    npcMet,
+    highestBond,
+    itemsFound: state.obtainedItems.length,
+    obtainedItemIds: state.obtainedItems,
   };
 }
 
@@ -634,11 +811,328 @@ function RainbowBorder({ children, className }: { children: React.ReactNode; cla
 }
 
 /* ------------------------------------------------------------------ */
+/*  Helpers for enhanced ending                                        */
+/* ------------------------------------------------------------------ */
+
+function NewRecordBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-gold/20 text-accent-gold border border-accent-gold/40">
+      <TrendingUp size={10} />
+      新纪录！
+    </span>
+  );
+}
+
+function StatRow({ label, value, highlight, suffix, icon }: { label: string; value: string | number; highlight?: boolean; suffix?: string; icon?: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between py-1.5">
+      <div className="flex items-center gap-2 text-xs text-text-secondary font-body">
+        {icon}
+        {label}
+      </div>
+      <div className="flex items-center gap-2">
+        {highlight && <NewRecordBadge />}
+        <span className="text-sm font-mono font-bold text-text-primary">{value}{suffix}</span>
+      </div>
+    </div>
+  );
+}
+
+function TimelineNode({ label, age, color, isActive }: { label: string; age: number; color: string; isActive: boolean }) {
+  return (
+    <div className={`flex flex-col items-center ${isActive ? 'opacity-100' : 'opacity-40'}`}>
+      <div
+        className="w-3 h-3 rounded-full mb-1"
+        style={{ backgroundColor: isActive ? color : '#6B6B8A', boxShadow: isActive ? `0 0 8px ${color}` : 'none' }}
+      />
+      <span className="text-[10px] font-body text-text-secondary">{label}</span>
+      <span className="text-[10px] font-mono text-text-muted">{age}岁</span>
+    </div>
+  );
+}
+
+function LifeTimeline({ state, worldColor }: { state: GameState; worldColor: string }) {
+  const nodes = [
+    { label: '幼年', age: 0, key: 'childhood' },
+    { label: '成长', age: 12, key: 'growth' },
+    { label: '成年', age: 18, key: 'adult' },
+    { label: '暮年', age: Math.max(40, Math.floor(state.maxAge * 0.7)), key: 'elder' },
+    { label: '终结', age: state.age, key: 'death' },
+  ];
+
+  // Find milestone events for timeline
+  const milestones: { age: number; text: string; type: 'breakthrough' | 'choice' | 'bond' }[] = [];
+  for (const evt of state.eventHistory) {
+    if (evt.effects && typeof (evt.effects as any).realm === 'number' && (evt.effects as any).realm > 0) {
+      milestones.push({ age: evt.age, text: '境界突破', type: 'breakthrough' });
+    }
+  }
+  // Add bond milestones
+  const relEntries = Object.entries(state.relationships).filter(([, v]) => v >= 50);
+  if (relEntries.length > 0) {
+    const best = relEntries.reduce((a, b) => (a[1] > b[1] ? a : b));
+    const npc = state.world?.npcs.find((n) => n.id === best[0]);
+    if (npc) {
+      milestones.push({ age: Math.floor(state.age * 0.5), text: `与${npc.name}结下深厚羁绊`, type: 'bond' });
+    }
+  }
+
+  return (
+    <div className="w-full max-w-[600px] mb-6">
+      <div className="flex items-center gap-2 mb-4">
+        <History size={14} className="text-text-muted" />
+        <span className="text-xs font-bold font-body text-text-muted">人生回顾</span>
+      </div>
+      <div className="relative">
+        {/* Timeline line */}
+        <div className="absolute top-[5px] left-0 right-0 h-0.5 bg-border-subtle" />
+        <div className="flex justify-between relative">
+          {nodes.map((node) => (
+            <TimelineNode
+              key={node.key}
+              label={node.label}
+              age={node.age}
+              color={worldColor}
+              isActive={state.age >= node.age}
+            />
+          ))}
+        </div>
+      </div>
+      {/* Milestones */}
+      {milestones.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {milestones.slice(0, 3).map((m, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs font-body">
+              <span
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{
+                  backgroundColor: m.type === 'breakthrough' ? '#D4A843' : m.type === 'bond' ? '#FF6B6B' : worldColor,
+                }}
+              />
+              <span className="text-text-muted font-mono">{m.age}岁</span>
+              <span className="text-text-secondary">{m.text}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DetailedStatsPanel({ ending, history, worldColor }: { ending: EndingDisplay; state: GameState; history: GameHistory; worldColor: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-[600px] mb-6 rounded-xl border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm p-5"
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <Target size={16} style={{ color: worldColor }} />
+        <span className="font-body text-sm font-bold text-text-primary">此生统计</span>
+      </div>
+
+      <div className="space-y-1">
+        <StatRow
+          label="享年"
+          value={ending.age}
+          suffix=" 岁"
+          highlight={ending.age > history.bestAge && history.bestAge > 0}
+          icon={<Clock size={12} className="text-text-muted" />}
+        />
+        <StatRow
+          label="存活"
+          value={ending.age}
+          suffix=" 年"
+          icon={<History size={12} className="text-text-muted" />}
+        />
+        <StatRow
+          label="经历事件"
+          value={ending.eventCount}
+          suffix=" 个"
+          highlight={ending.eventCount > history.totalEvents && history.totalEvents > 0}
+          icon={<ScrollText size={12} className="text-text-muted" />}
+        />
+        <div className="h-px bg-border-subtle my-2" />
+        <StatRow
+          label="境界"
+          value={`${ending.realmName}`}
+          highlight={ending.realmStage > history.bestRealm && history.bestRealm > 0}
+          icon={<Sparkles size={12} className="text-text-muted" />}
+        />
+        <StatRow
+          label="突破次数"
+          value={ending.breakthroughCount}
+          suffix=" 次"
+          icon={<TrendingUp size={12} className="text-text-muted" />}
+        />
+        <div className="h-px bg-border-subtle my-2" />
+        <StatRow
+          label="最高属性"
+          value={`${ending.highestStat.name} (${ending.highestStat.value})`}
+          highlight={ending.highestStat.value > Math.max(...Object.values(history.bestStats)) && history.totalPlaythroughs > 0}
+          icon={<FlaskConical size={12} className="text-text-muted" />}
+        />
+        <div className="h-px bg-border-subtle my-2" />
+        <StatRow
+          label="战斗事件"
+          value={ending.combatEvents}
+          icon={<Sword size={12} className="text-text-muted" />}
+        />
+        <StatRow
+          label="恋爱事件"
+          value={ending.romanceEvents}
+          icon={<Heart size={12} className="text-text-muted" />}
+        />
+        <StatRow
+          label="隐藏事件"
+          value={ending.hiddenEvents}
+          icon={<Eye size={12} className="text-text-muted" />}
+        />
+        <div className="h-px bg-border-subtle my-2" />
+        <StatRow
+          label="做出选择"
+          value={ending.choiceTotal}
+          suffix=" 次"
+          icon={<Target size={12} className="text-text-muted" />}
+        />
+        <div className="flex items-center justify-between py-1 pl-6">
+          <span className="text-[11px] text-text-muted">成功</span>
+          <span className="text-xs font-mono text-accent-green">{ending.choiceSuccess}</span>
+        </div>
+        <div className="flex items-center justify-between py-1 pl-6">
+          <span className="text-[11px] text-text-muted">失败</span>
+          <span className="text-xs font-mono text-accent-red">{ending.choiceFail}</span>
+        </div>
+        <div className="h-px bg-border-subtle my-2" />
+        <StatRow
+          label="遇到NPC"
+          value={`${ending.npcMet} 人`}
+          icon={<User size={12} className="text-text-muted" />}
+        />
+        {ending.highestBond && (
+          <div className="flex items-center justify-between py-1 pl-6">
+            <span className="text-[11px] text-text-muted">最高羁绊</span>
+            <span className="text-xs font-mono text-text-primary">{ending.highestBond.name} ({ending.highestBond.value})</span>
+          </div>
+        )}
+        <div className="h-px bg-border-subtle my-2" />
+        <StatRow
+          label="获得道具"
+          value={`${ending.itemsFound} 个`}
+          highlight={ending.itemsFound > 0}
+          icon={<Package size={12} className="text-text-muted" />}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+function HistoryComparison({ ending, history, worldColor }: { ending: EndingDisplay; history: GameHistory; worldColor: string }) {
+  if (history.totalPlaythroughs === 0) return null;
+
+  const comparisons = [
+    { label: '最高年龄', current: ending.age, best: history.bestAge, unit: '岁' },
+    { label: '最高境界', current: ending.realmStage, best: history.bestRealm, unit: '阶' },
+    { label: '最多事件', current: ending.eventCount, best: history.totalEvents, unit: '个' },
+    { label: '最高属性', current: ending.highestStat.value, best: Math.max(...Object.values(history.bestStats)), unit: '' },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="w-full max-w-[600px] mb-6 rounded-xl border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm p-5"
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy size={16} style={{ color: worldColor }} />
+        <span className="font-body text-sm font-bold text-text-primary">与历史最佳对比</span>
+      </div>
+      <div className="space-y-3">
+        {comparisons.map((comp) => {
+          const isNewRecord = comp.current > comp.best;
+          const pct = comp.best > 0 ? Math.round((comp.current / comp.best) * 100) : 100;
+          return (
+            <div key={comp.label} className="space-y-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-secondary font-body">{comp.label}</span>
+                <div className="flex items-center gap-2">
+                  {isNewRecord && comp.best > 0 && <NewRecordBadge />}
+                  <span className="font-mono text-text-primary">
+                    {comp.current}{comp.unit} <span className="text-text-muted">/ 最佳 {comp.best}{comp.unit}</span>
+                  </span>
+                </div>
+              </div>
+              <div className="w-full h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: isNewRecord ? '#D4A843' : worldColor }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(100, pct)}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+function NewItemsPanel({ ending }: { ending: EndingDisplay }) {
+  if (ending.obtainedItemIds.length === 0) return null;
+
+  const items = ending.obtainedItemIds
+    .map((id) => rebirthItems.find((i) => i.id === id))
+    .filter(Boolean);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+      className="w-full max-w-[600px] mb-6 rounded-xl border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm p-5"
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <Package size={16} className="text-accent-gold" />
+        <span className="font-body text-sm font-bold text-text-primary">本次获得的道具</span>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {items.map((item) => (
+          <div
+            key={item!.id}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-bg-tertiary/60"
+            style={{ borderColor: `${getRarityColor(item!.rarity)}40` }}
+          >
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: getRarityColor(item!.rarity) }}
+            />
+            <span className="text-xs font-body text-text-primary">{item!.name}</span>
+            <span
+              className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+              style={{
+                backgroundColor: `${getRarityColor(item!.rarity)}20`,
+                color: getRarityColor(item!.rarity),
+              }}
+            >
+              {getRarityLabel(item!.rarity)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Main Ending Page                                                   */
 /* ------------------------------------------------------------------ */
 export default function Ending() {
   const navigate = useNavigate();
-  const { state } = useGameContext();
+  const { state, saveHistory } = useGameContext();
 
   // Use dynamically calculated ending based on game state;
   // fall back to sample ending if no game has been played.
@@ -648,15 +1142,43 @@ export default function Ending() {
   const config = CATEGORY_CONFIG[ending.category];
   const worldColor = WORLD_COLORS[ending.worldName] || '#D4A843';
 
-  /* Animation stage: 0=initial, 1=bg, 2=badge, 3=title, 4=name, 5=desc, 6=stats, 7=achievements, 8=buttons */
+  // Load history and save current playthrough
+  const [history, setHistory] = useState<GameHistory | null>(null);
+  useEffect(() => {
+    if (state.isDead || state.age > 0) {
+      saveHistory();
+      setHistory(loadGameHistory());
+    }
+  }, [state.isDead, state.age, saveHistory]);
+
+  /* Animation stage: 0=initial, 1=bg, 2=badge, 3=title, 4=name, 5=desc, 6=stats, 7=timeline, 8=items, 9=achievements, 10=buttons */
   const [stage, setStage] = useState(0);
   const [skipToStage, setSkipToStage] = useState(0);
-  const totalStages = 8;
+  const totalStages = 10;
+
+  /* Achievement system */
+  const { checkAndUnlock, unlockedCount, totalCount, progressByCategory } = useAchievements();
+  const [sessionUnlocks, setSessionUnlocks] = useState<{ id: string; name: string; description: string; category: string }[]>([]);
+
+  useEffect(() => {
+    if (state.isDead || state.ending || state.age > 0) {
+      const results = checkAndUnlock(state);
+      if (results.length > 0) {
+        setSessionUnlocks(results.map((r) => ({
+          id: r.id,
+          name: r.title,
+          description: r.description,
+          category: r.category,
+        })));
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* Advance through stages */
   useEffect(() => {
     if (stage >= totalStages) return;
-    const delays = [200, 500, 1200, 2200, 2800, 3800, 4800, 5800];
+    const delays = [200, 500, 1200, 2200, 2800, 3800, 4600, 5400, 6000, 6800, 7800];
     const timer = setTimeout(() => {
       setStage(s => Math.min(s + 1, totalStages));
     }, delays[stage] || 500);
@@ -689,10 +1211,21 @@ export default function Ending() {
   const showName = stage >= 4 || skipToStage > 0;
   const showDesc = stage >= 5 || skipToStage > 0;
   const showStats = (stage >= 6 || skipToStage > 0) && (descDone || skipToStage > 0);
-  const showAchievements = (stage >= 7 || skipToStage > 0) && ending.unlockedAchievements.length > 0;
-  const showButtons = stage >= 8 || skipToStage > 0;
+  const showTimeline = (stage >= 7 || skipToStage > 0) && (descDone || skipToStage > 0) && (state.isDead || state.age > 0);
+  const showNewItems = (stage >= 8 || skipToStage > 0) && ending.obtainedItemIds.length > 0 && (descDone || skipToStage > 0);
+  const showAchievements = (stage >= 9 || skipToStage > 0) && (sessionUnlocks.length > 0 || ending.unlockedAchievements.length > 0);
+  const showAchievementProgress = (stage >= 9 || skipToStage > 0) && (descDone || skipToStage > 0);
+  const showHistoryComp = (stage >= 7 || skipToStage > 0) && history && history.totalPlaythroughs > 0 && (descDone || skipToStage > 0);
+  const showButtons = stage >= 10 || skipToStage > 0;
 
-  const hasAchievements = ending.unlockedAchievements.length > 0;
+  const hasAchievements = sessionUnlocks.length > 0 || ending.unlockedAchievements.length > 0;
+
+  const relationships = state.relationships;
+  const npcs = state.world?.npcs ?? [];
+  const relationshipEntries = Object.entries(relationships)
+    .filter(([, val]) => val !== 0)
+    .sort(([, a], [, b]) => b - a);
+  const hasLover = relationshipEntries.some(([, val]) => val >= 80);
 
   return (
     <div
@@ -897,6 +1430,127 @@ export default function Ending() {
           )}
         </AnimatePresence>
 
+        {/* Detailed Stats Panel */}
+        <AnimatePresence>
+          {showStats && (state.isDead || state.age > 0) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center w-full"
+            >
+              <DetailedStatsPanel ending={ending} state={state} history={history ?? { bestAge: 0, bestRealm: 0, totalEvents: 0, endingsUnlocked: [], bestStats: { strength: 0, intelligence: 0, charisma: 0, luck: 0, health: 0, special: 0 }, totalPlaythroughs: 0, totalItemsFound: 0 }} worldColor={worldColor} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Relationship Review */}
+        <AnimatePresence>
+          {showStats && relationshipEntries.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: easeSmooth }}
+              className="w-full max-w-[600px] mb-8"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Heart size={18} style={{ color: worldColor }} />
+                <span className="font-body text-sm font-bold text-text-primary">此生羁绊</span>
+              </div>
+              <div className="space-y-3">
+                {relationshipEntries.map(([npcId, val]) => {
+                  const npc = npcs.find((n) => n.id === npcId);
+                  if (!npc) return null;
+                  const color = getRelationshipColor(val);
+                  return (
+                    <motion.div
+                      key={npcId}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm"
+                    >
+                      <span className="text-xl">{npc.avatar ?? '👤'}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-body text-sm font-bold text-text-primary">{npc.name}</span>
+                          <span
+                            className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                            style={{ backgroundColor: `${color}20`, color }}
+                          >
+                            {getRelationshipLabel(val)}
+                          </span>
+                        </div>
+                        <div className="w-full h-1.5 bg-bg-tertiary rounded-full overflow-hidden mt-1">
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${Math.max(0, Math.min(100, ((val + 100) / 200) * 100))}%`, backgroundColor: color }}
+                          />
+                        </div>
+                      </div>
+                      <span className="font-mono text-sm font-bold" style={{ color }}>{val}</span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+              {hasLover && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-4 px-4 py-3 rounded-lg border border-[#FF4D6D]/30 bg-[#FF4D6D]/10 backdrop-blur-sm"
+                >
+                  <p className="font-body text-sm text-[#FF4D6D] font-bold">
+                    💕 特殊的羁绊结局提示：有人在世界的尽头等待着你...
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Life Timeline */}
+        <AnimatePresence>
+          {showTimeline && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center w-full"
+            >
+              <LifeTimeline state={state} worldColor={worldColor} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* History Comparison */}
+        <AnimatePresence>
+          {showHistoryComp && history && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center w-full"
+            >
+              <HistoryComparison ending={ending} history={history} worldColor={worldColor} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* New Items Panel */}
+        <AnimatePresence>
+          {showNewItems && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center w-full"
+            >
+              <NewItemsPanel ending={ending} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Achievement Unlocks */}
         <AnimatePresence>
           {showAchievements && hasAchievements && (
@@ -916,7 +1570,7 @@ export default function Ending() {
                 <span className="font-body text-sm font-bold text-accent-gold">新成就解锁!</span>
               </motion.div>
 
-              {ending.unlockedAchievements.map((ach, i) => (
+              {sessionUnlocks.map((ach, i) => (
                 <motion.div
                   key={ach.id}
                   initial={{ opacity: 0, x: -40 }}
@@ -936,6 +1590,86 @@ export default function Ending() {
                   </div>
                 </motion.div>
               ))}
+
+              {/* Fallback: show dynamic ending achievements if no session unlocks */}
+              {sessionUnlocks.length === 0 && ending.unlockedAchievements.map((ach, i) => (
+                <motion.div
+                  key={ach.id}
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.15, ease: easeSmooth }}
+                  whileHover={{ scale: 1.02 }}
+                  className="w-full px-4 py-3 rounded-lg border border-accent-gold/30 bg-gradient-to-r from-bg-secondary/90 to-transparent backdrop-blur-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-accent-gold/20 flex items-center justify-center flex-shrink-0">
+                      <Sparkles size={18} className="text-accent-gold" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-body text-sm font-bold text-text-primary truncate">{ach.name}</p>
+                      <p className="font-body text-xs text-text-secondary">{ach.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Overall Achievement Progress */}
+        <AnimatePresence>
+          {showAchievementProgress && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: easeSmooth }}
+              className="w-full max-w-[500px] mb-8 px-5 py-4 rounded-xl border border-border-subtle bg-bg-secondary/80 backdrop-blur-sm"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Trophy size={16} className="text-accent-gold" />
+                  <span className="font-body text-sm font-bold text-text-primary">成就总览</span>
+                </div>
+                <span className="font-mono text-sm font-bold text-accent-gold">
+                  {unlockedCount}/{totalCount}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden mb-4">
+                <motion.div
+                  className="h-full rounded-full bg-accent-gold"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0}%` }}
+                  transition={{ duration: 1, ease: easeSmooth }}
+                />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {Object.entries(progressByCategory).map(([cat, { total, unlocked }]) => {
+                  const colors: Record<string, string> = {
+                    world: '#2DD4A0',
+                    stat: '#00D4FF',
+                    event: '#FF6B2D',
+                    speed: '#FFD700',
+                    secret: '#9B6BFF',
+                    meta: '#FF2D55',
+                  };
+                  const color = colors[cat] ?? '#D4A843';
+                  const pct = total > 0 ? (unlocked / total) * 100 : 0;
+                  return (
+                    <div key={cat} className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-body text-text-secondary capitalize">{cat}</span>
+                        <span className="text-[10px] font-mono text-text-muted">{unlocked}/{total}</span>
+                      </div>
+                      <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${pct}%`, backgroundColor: color }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -976,19 +1710,28 @@ export default function Ending() {
               transition={{ duration: 0.5, ease: easeSmooth }}
               className="flex flex-wrap justify-center gap-4"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={(e) => { e.stopPropagation(); navigate('/rebirth'); }}
-                className="flex items-center gap-2 px-8 py-3 rounded-full font-body text-base font-bold text-white transition-shadow duration-300"
-                style={{
-                  background: `linear-gradient(135deg, ${worldColor}, ${worldColor}88)`,
-                  boxShadow: `0 4px 20px ${worldColor}40`,
-                }}
-              >
-                <RotateCcw size={18} />
-                再次转生
-              </motion.button>
+              <div className="flex flex-col items-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={(e) => { e.stopPropagation(); navigate('/rebirth'); }}
+                  className="flex items-center gap-2 px-8 py-3 rounded-full font-body text-base font-bold text-white transition-shadow duration-300"
+                  style={{
+                    background: `linear-gradient(135deg, ${worldColor}, ${worldColor}88)`,
+                    boxShadow: `0 4px 20px ${worldColor}40`,
+                  }}
+                >
+                  <RotateCcw size={18} />
+                  再次转生
+                </motion.button>
+                <div className="flex items-center gap-3 text-xs text-text-muted font-body">
+                  <span className="flex items-center gap-1">
+                    <Package size={12} />
+                    持有道具: {state.inventory.length}个
+                  </span>
+                  <span className="text-text-secondary">返回主界面可装备道具</span>
+                </div>
+              </div>
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -1015,6 +1758,18 @@ export default function Ending() {
           </motion.p>
         )}
       </div>
+
+      {/* Achievement Popup */}
+      <AchievementPopup newAchievements={sessionUnlocks.map((s) => {
+        const achDef = achievements.find((a) => a.id === s.id);
+        return {
+          id: s.id,
+          title: s.name,
+          description: s.description,
+          category: s.category as import('@/engine/events/types').AchievementData['category'],
+          icon: achDef?.icon ?? 'star',
+        };
+      })} />
 
       {/* ── Ken Burns CSS ── */}
       <style>{`

@@ -773,8 +773,8 @@ export const wuxiaTemplates: EventTemplate[] = [
       '',
     ],
     choices: [
-      { text: '坚守旧师，自立门户', successRate: 1, successText: '你选择了坚守旧师，自立门户，从此走上了属于自己的道路', failText: '你选择了坚守旧师，自立门户，但前路远比想象中艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_farmers_son_path'], failFlags: ['branch_identity_farmers_son_path_fail'] },
-      { text: '改换门庭，求得真传', successRate: 1, successText: '你选择了改换门庭，求得真传，找到了新的方向', failText: '你选择了改换门庭，求得真传，却发现自己失去了根基', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_farmers_son_new'], failFlags: ['branch_identity_farmers_son_new_fail'] },
+      { text: '坚守旧师，自立门户', successRate: 1, successText: '你选择了坚守旧师，自立门户，从此走上了属于自己的道路', failText: '你选择了坚守旧师，自立门户，但前路远比想象中艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_farmers_son_path'], failFlags: ['branch_identity_farmers_son_path_fail'], relationshipEffects: { 'drunken_master': 10 } },
+      { text: '改换门庭，求得真传', successRate: 1, successText: '你选择了改换门庭，求得真传，找到了新的方向', failText: '你选择了改换门庭，求得真传，却发现自己失去了根基', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_farmers_son_new'], failFlags: ['branch_identity_farmers_son_new_fail'], relationshipEffects: { 'twin_swords': 10 } },
     ],
     flags: ['chain_farmers_son_adult_1'],
     requiredFlags: ['chain_farmers_son_growth_0'],
@@ -868,8 +868,8 @@ export const wuxiaTemplates: EventTemplate[] = [
       '',
     ],
     choices: [
-      { text: '揭发罪行，背负骂名', successRate: 1, successText: '你选择了揭发罪行，背负骂名，从此走上了属于自己的道路', failText: '你选择了揭发罪行，背负骂名，但前路远比想象中艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_aristocrat_path'], failFlags: ['branch_identity_aristocrat_path_fail'] },
-      { text: '沉默继位，暗中革新', successRate: 1, successText: '你选择了沉默继位，暗中革新，找到了新的方向', failText: '你选择了沉默继位，暗中革新，却发现自己失去了根基', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_aristocrat_new'], failFlags: ['branch_identity_aristocrat_new_fail'] },
+      { text: '揭发罪行，背负骂名', successRate: 1, successText: '你选择了揭发罪行，背负骂名，从此走上了属于自己的道路', failText: '你选择了揭发罪行，背负骂名，但前路远比想象中艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_aristocrat_path'], failFlags: ['branch_identity_aristocrat_path_fail'], relationshipEffects: { 'sword_fairy': 10 } },
+      { text: '沉默继位，暗中革新', successRate: 1, successText: '你选择了沉默继位，暗中革新，找到了新的方向', failText: '你选择了沉默继位，暗中革新，却发现自己失去了根基', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_aristocrat_new'], failFlags: ['branch_identity_aristocrat_new_fail'], relationshipEffects: { 'demon_sect_master': 10 } },
     ],
     flags: ['chain_aristocrat_adult_1'],
     requiredFlags: ['chain_aristocrat_growth_0'],
@@ -963,8 +963,8 @@ export const wuxiaTemplates: EventTemplate[] = [
       '',
     ],
     choices: [
-      { text: '接受招安，以权护民', successRate: 1, successText: '你选择了接受招安，以权护民，从此走上了属于自己的道路', failText: '你选择了接受招安，以权护民，但前路远比想象中艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_orphan_path'], failFlags: ['branch_identity_orphan_path_fail'] },
-      { text: '拒绝招安，江湖独行', successRate: 1, successText: '你选择了拒绝招安，江湖独行，找到了新的方向', failText: '你选择了拒绝招安，江湖独行，却发现自己失去了根基', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_orphan_new'], failFlags: ['branch_identity_orphan_new_fail'] },
+      { text: '接受招安，以权护民', successRate: 1, successText: '你选择了接受招安，以权护民，从此走上了属于自己的道路', failText: '你选择了接受招安，以权护民，但前路远比想象中艰难', effects: { special: 10, strength: 5 }, failEffects: { intelligence: 5, health: -5 }, flags: ['branch_identity_orphan_path'], failFlags: ['branch_identity_orphan_path_fail'], relationshipEffects: { 'prince': 10 } },
+      { text: '拒绝招安，江湖独行', successRate: 1, successText: '你选择了拒绝招安，江湖独行，找到了新的方向', failText: '你选择了拒绝招安，江湖独行，却发现自己失去了根基', effects: { luck: 5, charisma: 5 }, failEffects: { luck: -3 }, flags: ['branch_identity_orphan_new'], failFlags: ['branch_identity_orphan_new_fail'], relationshipEffects: { 'sword_fairy': 10 } },
     ],
     flags: ['chain_orphan_adult_1'],
     requiredFlags: ['chain_orphan_growth_0'],

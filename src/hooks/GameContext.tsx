@@ -1,19 +1,24 @@
 import { createContext, useContext, type ReactNode } from 'react';
-import type { GameState, Event, Stats } from '@/engine/types';
+import type { GameState, Event, EventEffects } from '@/engine/types';
 
 export interface GameContextValue {
   state: GameState;
   startGame: () => void;
   advanceYear: () => void;
-  selectChoice: (choiceIndex: number) => { success: boolean; text: string; effects: Partial<Stats> } | null;
+  selectChoice: (choiceIndex: number) => { success: boolean; text: string; effects: EventEffects; rewardItem?: string; tempItemName?: string } | null;
   setEvent: (event: Event | null) => void;
   setEnding: (ending: NonNullable<GameState['ending']>) => void;
   resetGame: () => void;
-  updateStats: (effects: Partial<Stats>) => void;
+  updateStats: (effects: EventEffects) => void;
   addFlags: (flags: string[]) => void;
   addRelationship: (npcId: string, delta: number) => void;
+  applyRelationshipEffects: (effects: Record<string, number>) => void;
+  getRelationshipLevel: (npcId: string) => 'stranger' | 'acquaintance' | 'friend' | 'confidant' | 'lover';
+  getEncounteredNPCs: () => string[];
   equipItem: (itemId: string) => void;
   unequipItem: (itemId: string) => void;
+  saveHistory: () => void;
+  recordEventCategory: (category: string) => void;
 }
 
 export const GameContext = createContext<GameContextValue | null>(null);

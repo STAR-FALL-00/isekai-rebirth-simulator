@@ -37,7 +37,9 @@ export function createInitialState(): GameState {
     maxAge: 100,
     realm: 0,
     stats: { ...defaultStats },
+    talentLevel: 'average',
     relationships: {},
+    relationshipEventCount: 0,
     flags: [],
     eventHistory: [],
     currentEvent: null,
@@ -48,6 +50,13 @@ export function createInitialState(): GameState {
     inventory: [],
     equippedItems: [],
     totalRebirths: 0,
+    tempItems: [],
+    obtainedItems: [],
+    choiceStats: { total: 0, success: 0, fail: 0 },
+    eventCounters: { combat: 0, romance: 0, hidden: 0 },
+    eventCategoryCounts: {},
+    deathSurvivedCount: 0,
+    startingStats: { ...defaultStats },
   };
 }
 
@@ -133,6 +142,7 @@ export function startRandomGame(state: GameState): GameState {
     stats: baseStats,
     talentLevel,
     relationships: initialRelationships,
+    relationshipEventCount: 0,
     flags: [`start_${identity.id}`, `talent_${talentLevel}`],
     eventHistory: [],
     currentEvent: null,
@@ -143,5 +153,12 @@ export function startRandomGame(state: GameState): GameState {
     inventory: newInventory,
     equippedItems: [], // Items consumed on rebirth
     totalRebirths: state.totalRebirths + 1,
+    tempItems: [],
+    obtainedItems: [],
+    choiceStats: { total: 0, success: 0, fail: 0 },
+    eventCounters: { combat: 0, romance: 0, hidden: 0 },
+    eventCategoryCounts: {},
+    deathSurvivedCount: 0,
+    startingStats: { ...baseStats },
   };
 }
