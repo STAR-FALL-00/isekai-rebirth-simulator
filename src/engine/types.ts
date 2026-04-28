@@ -191,6 +191,94 @@ export const FLOATING_CITADEL_REALMS = [
   { stage: 7, name: '解放者', maxAgeBase: 9999 },
 ];
 
+export const DOUPO_REALMS = [
+  { stage: 0, name: '斗之气', maxAgeBase: 100 },
+  { stage: 1, name: '斗者', maxAgeBase: 180 },
+  { stage: 2, name: '斗师', maxAgeBase: 300 },
+  { stage: 3, name: '大斗师', maxAgeBase: 500 },
+  { stage: 4, name: '斗灵', maxAgeBase: 800 },
+  { stage: 5, name: '斗王', maxAgeBase: 1200 },
+  { stage: 6, name: '斗皇', maxAgeBase: 2000 },
+  { stage: 7, name: '斗帝', maxAgeBase: 9999 },
+];
+
+export const DRAGON_RAJA_REALMS = [
+  { stage: 0, name: '普通人', maxAgeBase: 100 },
+  { stage: 1, name: 'D级混血', maxAgeBase: 180 },
+  { stage: 2, name: 'C级混血', maxAgeBase: 300 },
+  { stage: 3, name: 'B级混血', maxAgeBase: 500 },
+  { stage: 4, name: 'A级混血', maxAgeBase: 800 },
+  { stage: 5, name: 'S级混血', maxAgeBase: 1200 },
+  { stage: 6, name: 'SS级混血', maxAgeBase: 2000 },
+  { stage: 7, name: '龙王级', maxAgeBase: 9999 },
+];
+
+export const THREE_BODY_REALMS = [
+  { stage: 0, name: '平民', maxAgeBase: 100 },
+  { stage: 1, name: '学者', maxAgeBase: 180 },
+  { stage: 2, name: '工程师', maxAgeBase: 300 },
+  { stage: 3, name: '科学家', maxAgeBase: 500 },
+  { stage: 4, name: '面壁者', maxAgeBase: 800 },
+  { stage: 5, name: '执剑人', maxAgeBase: 1200 },
+  { stage: 6, name: '文明守护者', maxAgeBase: 2000 },
+  { stage: 7, name: '宇宙级存在', maxAgeBase: 9999 },
+];
+
+export const FRIEREN_REALMS = [
+  { stage: 0, name: '魔法学徒', maxAgeBase: 100 },
+  { stage: 1, name: '初级魔法使', maxAgeBase: 180 },
+  { stage: 2, name: '中级魔法使', maxAgeBase: 300 },
+  { stage: 3, name: '上级魔法使', maxAgeBase: 500 },
+  { stage: 4, name: '宫廷魔法使', maxAgeBase: 800 },
+  { stage: 5, name: '大魔法使', maxAgeBase: 1200 },
+  { stage: 6, name: '贤者', maxAgeBase: 2000 },
+  { stage: 7, name: '魔法之神', maxAgeBase: 9999 },
+];
+
+export const GUNDAM_SEED_REALMS = [
+  { stage: 0, name: '调整者平民', maxAgeBase: 100 },
+  { stage: 1, name: '士兵', maxAgeBase: 180 },
+  { stage: 2, name: '王牌机师', maxAgeBase: 300 },
+  { stage: 3, name: '舰长', maxAgeBase: 500 },
+  { stage: 4, name: '指挥官', maxAgeBase: 800 },
+  { stage: 5, name: '将军', maxAgeBase: 1200 },
+  { stage: 6, name: '国家领袖', maxAgeBase: 2000 },
+  { stage: 7, name: '和平缔造者', maxAgeBase: 9999 },
+];
+
+export const RAILGUN_REALMS = [
+  { stage: 0, name: '无能力者', maxAgeBase: 100 },
+  { stage: 1, name: '低能力者', maxAgeBase: 180 },
+  { stage: 2, name: '异能力者', maxAgeBase: 300 },
+  { stage: 3, name: '强能力者', maxAgeBase: 500 },
+  { stage: 4, name: '大能力者', maxAgeBase: 800 },
+  { stage: 5, name: '超能力者', maxAgeBase: 1200 },
+  { stage: 6, name: '绝对能力者', maxAgeBase: 2000 },
+  { stage: 7, name: '系统外存在', maxAgeBase: 9999 },
+];
+
+export const FATE_REALMS = [
+  { stage: 0, name: '普通人', maxAgeBase: 100 },
+  { stage: 1, name: '魔术师', maxAgeBase: 180 },
+  { stage: 2, name: '魔术使', maxAgeBase: 300 },
+  { stage: 3, name: '魔法使', maxAgeBase: 500 },
+  { stage: 4, name: '冠位魔术师', maxAgeBase: 800 },
+  { stage: 5, name: '封印指定', maxAgeBase: 1200 },
+  { stage: 6, name: '根源连接者', maxAgeBase: 2000 },
+  { stage: 7, name: '抑止力', maxAgeBase: 9999 },
+];
+
+export const KAGUYA_REALMS = [
+  { stage: 0, name: '普通学生', maxAgeBase: 100 },
+  { stage: 1, name: '学生会干事', maxAgeBase: 180 },
+  { stage: 2, name: '学生会部长', maxAgeBase: 300 },
+  { stage: 3, name: '学生会副会长', maxAgeBase: 500 },
+  { stage: 4, name: '学生会长', maxAgeBase: 800 },
+  { stage: 5, name: '社会精英', maxAgeBase: 1200 },
+  { stage: 6, name: '企业家', maxAgeBase: 2000 },
+  { stage: 7, name: '国家栋梁', maxAgeBase: 9999 },
+];
+
 export const WORLD_REALM_TABLES: Record<string, Array<{ stage: number; name: string; maxAgeBase: number }>> = {
   cultivation: CULTIVATION_REALMS,
   magic: MAGIC_REALMS,
@@ -198,6 +286,14 @@ export const WORLD_REALM_TABLES: Record<string, Array<{ stage: number; name: str
   apocalypse: APOCALYPSE_REALMS,
   wuxia: WUXIA_REALMS,
   floating_citadel: FLOATING_CITADEL_REALMS,
+  doupo: DOUPO_REALMS,
+  dragon_raja: DRAGON_RAJA_REALMS,
+  three_body: THREE_BODY_REALMS,
+  frieren: FRIEREN_REALMS,
+  gundam_seed: GUNDAM_SEED_REALMS,
+  railgun: RAILGUN_REALMS,
+  fate: FATE_REALMS,
+  kaguya: KAGUYA_REALMS,
 };
 
 export interface GameState {

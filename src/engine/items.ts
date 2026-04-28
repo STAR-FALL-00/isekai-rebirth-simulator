@@ -423,6 +423,206 @@ export const rebirthItems: RebirthItem[] = [
     statBonus: { strength: 5, intelligence: 5, charisma: 5, luck: 5, health: 5, special: 5 },
     rarity: 'legendary',
   },
+
+  // ── 斗破苍穹 ──
+  {
+    id: 'doupo_flame_fragment',
+    name: '异火残片',
+    description: '一朵奇异火焰的残片，散发着灼热的气息。装备后略微增加转生至斗破苍穹的概率。',
+    worldBias: { doupo: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'doupo_alchemy_cauldron',
+    name: '炼药鼎',
+    description: '一尊古朴的炼药鼎，传闻能炼制出提升斗气的丹药。装备后增加转生至斗破苍穹的概率，初始智力+3。',
+    worldBias: { doupo: 5 },
+    statBonus: { intelligence: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'doupo_martial_art',
+    name: '玄阶功法',
+    description: '一卷记载着高阶斗气功法的卷轴，修炼可大幅提升实力。装备后大幅增加转生至斗破苍穹的概率，初始力量+8。',
+    worldBias: { doupo: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, dragon_raja: 0.6, three_body: 0.6, frieren: 0.6, gundam_seed: 0.6, railgun: 0.6, fate: 0.6, kaguya: 0.6 },
+    statBonus: { strength: 8, special: 2 },
+    rarity: 'epic',
+  },
+
+  // ── 龙族 ──
+  {
+    id: 'dragon_blood_vial',
+    name: '龙血试剂',
+    description: '一支装有龙族血清的试剂，蕴含着古老龙族的力量。装备后略微增加转生至龙族世界的概率。',
+    worldBias: { dragon_raja: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'dragon_tongue_scroll',
+    name: '言灵卷轴',
+    description: '一卷记载着龙族言灵的神秘卷轴，能唤醒沉睡的血脉。装备后增加转生至龙族世界的概率，初始智力+3。',
+    worldBias: { dragon_raja: 5 },
+    statBonus: { intelligence: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'dragon_alchemy_weapon',
+    name: '炼金武器',
+    description: '一把由炼金术锻造的屠龙武器，锋利无比。装备后大幅增加转生至龙族世界的概率，初始力量+8。',
+    worldBias: { dragon_raja: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, three_body: 0.6, frieren: 0.6, gundam_seed: 0.6, railgun: 0.6, fate: 0.6, kaguya: 0.6 },
+    statBonus: { strength: 8, special: 2 },
+    rarity: 'epic',
+  },
+
+  // ── 三体 ──
+  {
+    id: 'three_body_droplet',
+    name: '水滴碎片',
+    description: '一块来自三体文明探测器"水滴"的碎片，表面光滑如镜。装备后略微增加转生至三体世界的概率。',
+    worldBias: { three_body: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'three_body_sophon',
+    name: '智子探测器',
+    description: '一个微型的智子探测器模型，仿佛能窥视一切。装备后增加转生至三体世界的概率，初始智力+3。',
+    worldBias: { three_body: 5 },
+    statBonus: { intelligence: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'three_body_dual_vector',
+    name: '二向箔',
+    description: '一片来自高等文明的降维武器残片，散发着诡异的空间波动。装备后大幅增加转生至三体世界的概率，初始智力+8。',
+    worldBias: { three_body: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, dragon_raja: 0.6, frieren: 0.6, gundam_seed: 0.6, railgun: 0.6, fate: 0.6, kaguya: 0.6 },
+    statBonus: { intelligence: 8, special: 2 },
+    rarity: 'epic',
+  },
+
+  // ── 葬送的芙莉莲 ──
+  {
+    id: 'frieren_spellbook',
+    name: '古老魔法书',
+    description: '一本记载着古老魔法的书籍，纸张泛黄但魔力犹存。装备后略微增加转生至芙莉莲世界的概率。',
+    worldBias: { frieren: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'frieren_longevity_potion',
+    name: '长寿药水',
+    description: '一瓶精灵族酿制的长寿药水，能延长寿命。装备后增加转生至芙莉莲世界的概率，初始生命+3。',
+    worldBias: { frieren: 5 },
+    statBonus: { health: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'frieren_hero_sword',
+    name: '勇者之剑',
+    description: '一把曾经属于勇者的圣剑，剑身刻有古老的符文。装备后大幅增加转生至芙莉莲世界的概率，初始力量+8。',
+    worldBias: { frieren: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, dragon_raja: 0.6, three_body: 0.6, gundam_seed: 0.6, railgun: 0.6, fate: 0.6, kaguya: 0.6 },
+    statBonus: { strength: 8, special: 2 },
+    rarity: 'epic',
+  },
+
+  // ── 高达SEED ──
+  {
+    id: 'gundam_haro',
+    name: '哈罗',
+    description: '一个圆滚滚的绿色球形机器人，会发出"哈罗、哈罗"的声音。装备后略微增加转生至高达SEED世界的概率。',
+    worldBias: { gundam_seed: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'gundam_coordinator_gene',
+    name: '调整者基因样本',
+    description: '一支装有调整者基因样本的试管，蕴含着超越常人的潜能。装备后增加转生至高达SEED世界的概率，初始智力+3。',
+    worldBias: { gundam_seed: 5 },
+    statBonus: { intelligence: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'gundam_ms_wreckage',
+    name: '机动战士残骸',
+    description: '一块来自高达机动战士的残骸，散发着金属与硝烟的气息。装备后大幅增加转生至高达SEED世界的概率，初始力量+8。',
+    worldBias: { gundam_seed: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, dragon_raja: 0.6, three_body: 0.6, frieren: 0.6, railgun: 0.6, fate: 0.6, kaguya: 0.6 },
+    statBonus: { strength: 8, special: 2 },
+    rarity: 'epic',
+  },
+
+  // ── 超电磁炮 ──
+  {
+    id: 'railgun_coin',
+    name: '电磁硬币',
+    description: '一枚特制的电磁硬币，是超电磁炮能力的标志性道具。装备后略微增加转生至学园都市的概率。',
+    worldBias: { railgun: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'railgun_ability_drug',
+    name: '能力开发药',
+    description: '一瓶学园都市研发的能力开发药物，据说能激发超能力。装备后增加转生至学园都市的概率，初始智力+3。',
+    worldBias: { railgun: 5 },
+    statBonus: { intelligence: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'railgun_network',
+    name: '御坂网络连接器',
+    description: '一个能连接御坂网络的神秘装置，能共享计算能力。装备后大幅增加转生至学园都市的概率，初始智力+8。',
+    worldBias: { railgun: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, dragon_raja: 0.6, three_body: 0.6, frieren: 0.6, gundam_seed: 0.6, fate: 0.6, kaguya: 0.6 },
+    statBonus: { intelligence: 8, special: 2 },
+    rarity: 'epic',
+  },
+
+  // ── Fate/stay night ──
+  {
+    id: 'fate_command_spell',
+    name: '令咒',
+    description: '一道鲜红的令咒纹路，是对从者的绝对命令权。装备后略微增加转生至Fate世界的概率。',
+    worldBias: { fate: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'fate_summoning_circle',
+    name: '英灵召唤阵',
+    description: '一张绘制着英灵召唤阵的羊皮纸，蕴含着神秘的魔力。装备后增加转生至Fate世界的概率，初始特殊+3。',
+    worldBias: { fate: 5 },
+    statBonus: { special: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'fate_grail_shard',
+    name: '圣杯碎片',
+    description: '一块来自圣杯的碎片，据说能实现持有者的愿望。装备后大幅增加转生至Fate世界的概率，初始特殊+8。',
+    worldBias: { fate: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, dragon_raja: 0.6, three_body: 0.6, frieren: 0.6, gundam_seed: 0.6, railgun: 0.6, kaguya: 0.6 },
+    statBonus: { special: 8, luck: 2 },
+    rarity: 'epic',
+  },
+
+  // ── 辉夜大小姐 ──
+  {
+    id: 'kaguya_armband',
+    name: '学生会长袖章',
+    description: '一枚秀知院学园学生会长的袖章，象征着责任与权威。装备后略微增加转生至辉夜世界的概率。',
+    worldBias: { kaguya: 2.5 },
+    rarity: 'common',
+  },
+  {
+    id: 'kaguya_love_manual',
+    name: '恋爱攻略手册',
+    description: '一本写满恋爱技巧的笔记本，据说作者是恋爱大师。装备后增加转生至辉夜世界的概率，初始魅力+3。',
+    worldBias: { kaguya: 5 },
+    statBonus: { charisma: 3 },
+    rarity: 'rare',
+  },
+  {
+    id: 'kaguya_shinomiya_badge',
+    name: '四宫家徽章',
+    description: '一枚刻有四宫家家纹的纯金徽章，代表着财阀的荣耀。装备后大幅增加转生至辉夜世界的概率，初始魅力+8。',
+    worldBias: { kaguya: 10, cultivation: 0.6, magic: 0.6, scifi: 0.6, apocalypse: 0.6, wuxia: 0.6, floating_citadel: 0.6, doupo: 0.6, dragon_raja: 0.6, three_body: 0.6, frieren: 0.6, gundam_seed: 0.6, railgun: 0.6, fate: 0.6 },
+    statBonus: { charisma: 8, intelligence: 2 },
+    rarity: 'epic',
+  },
 ];
 
 /** 根据稀有度获取颜色 */
@@ -457,6 +657,14 @@ export function calculateWorldWeights(
     apocalypse: 1,
     wuxia: 1,
     floating_citadel: 1,
+    doupo: 1,
+    dragon_raja: 1,
+    three_body: 1,
+    frieren: 1,
+    gundam_seed: 1,
+    railgun: 1,
+    fate: 1,
+    kaguya: 1,
   };
 
   const equippedItems = allItems.filter((item) => equippedItemIds.includes(item.id));

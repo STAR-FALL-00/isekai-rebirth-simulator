@@ -127,6 +127,106 @@ export const achievements: AchievementData[] = [
   { id: 'ach_fc_se_08', title: '真相追寻者', description: '发现浮空要塞的真相', category: 'secret', icon: 'search', condition: { type: 'flag_set', target: 1, key: 'discover_fc_truth' } },
 
   // ═══════════════════════════════════════════════════════════════
+  // NEW WORLDS — 8 worlds × 10 achievements = 80
+  // ═══════════════════════════════════════════════════════════════
+
+  // ── 斗破苍穹 ──
+  { id: 'ach_dp_01', title: '初入斗气', description: '第一次在斗破苍穹完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'doupo' } },
+  { id: 'ach_dp_02', title: '斗气达人', description: '在斗破苍穹完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'doupo' } },
+  { id: 'ach_dp_03', title: '斗破全结局', description: '解锁斗破苍穹的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'doupo' } },
+  { id: 'ach_dp_04', title: '力破苍穹', description: '在斗破苍穹力量属性达到200', category: 'stat', icon: 'dumbbell', condition: { type: 'max_stat_strength', target: 200 } },
+  { id: 'ach_dp_05', title: '异火掌控', description: '在斗破苍穹特殊属性达到200', category: 'stat', icon: 'gem', condition: { type: 'max_stat_special', target: 200 } },
+  { id: 'ach_dp_06', title: '初次战斗', description: '在斗破苍穹第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_dp_07', title: '炼药之路', description: '在斗破苍穹第一次触发修炼事件', category: 'event', icon: 'flame', condition: { type: 'event_category', target: 'cultivation' } },
+  { id: 'ach_dp_08', title: '速通斗破', description: '在斗破苍穹10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'doupo' } },
+  { id: 'ach_dp_09', title: '完美斗帝', description: '在斗破苍穹单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_dp_10', title: '陨落天才', description: '在斗破苍穹单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── 龙族 ──
+  { id: 'ach_dr_01', title: '初入龙族', description: '第一次在龙族世界完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'dragon_raja' } },
+  { id: 'ach_dr_02', title: '屠龙达人', description: '在龙族世界完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'dragon_raja' } },
+  { id: 'ach_dr_03', title: '龙族全结局', description: '解锁龙族世界的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'dragon_raja' } },
+  { id: 'ach_dr_04', title: '龙血觉醒', description: '在龙族世界力量属性达到200', category: 'stat', icon: 'dumbbell', condition: { type: 'max_stat_strength', target: 200 } },
+  { id: 'ach_dr_05', title: '言灵精通', description: '在龙族世界智力属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_dr_06', title: '初次屠龙', description: '在龙族世界第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_dr_07', title: '探索龙墓', description: '在龙族世界第一次触发探索事件', category: 'event', icon: 'compass', condition: { type: 'event_category', target: 'exploration' } },
+  { id: 'ach_dr_08', title: '极速龙族', description: '在龙族世界10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'dragon_raja' } },
+  { id: 'ach_dr_09', title: '龙族荣耀', description: '在龙族世界单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_dr_10', title: '血之哀', description: '在龙族世界单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── 三体 ──
+  { id: 'ach_tb_01', title: '初入三体', description: '第一次在三体世界完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'three_body' } },
+  { id: 'ach_tb_02', title: '面壁达人', description: '在三体世界完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'three_body' } },
+  { id: 'ach_tb_03', title: '三体全结局', description: '解锁三体世界的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'three_body' } },
+  { id: 'ach_tb_04', title: '科学天才', description: '在三体世界智力属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_tb_05', title: '生存专家', description: '在三体世界生命属性达到200', category: 'stat', icon: 'activity', condition: { type: 'max_stat_health', target: 200 } },
+  { id: 'ach_tb_06', title: '遭遇水滴', description: '在三体世界第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_tb_07', title: '宇宙探索', description: '在三体世界第一次触发探索事件', category: 'event', icon: 'compass', condition: { type: 'event_category', target: 'exploration' } },
+  { id: 'ach_tb_08', title: '极速三体', description: '在三体世界10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'three_body' } },
+  { id: 'ach_tb_09', title: '人类胜利', description: '在三体世界单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_tb_10', title: '黑暗森林', description: '在三体世界单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── 葬送的芙莉莲 ──
+  { id: 'ach_fr_01', title: '初入芙莉莲', description: '第一次在芙莉莲世界完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'frieren' } },
+  { id: 'ach_fr_02', title: '魔法达人', description: '在芙莉莲世界完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'frieren' } },
+  { id: 'ach_fr_03', title: '芙莉莲全结局', description: '解锁芙莉莲世界的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'frieren' } },
+  { id: 'ach_fr_04', title: '长寿精灵', description: '在芙莉莲世界活过1000岁', category: 'stat', icon: 'timer', condition: { type: 'max_age', target: 1000 } },
+  { id: 'ach_fr_05', title: '魔法精通', description: '在芙莉莲世界智力属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_fr_06', title: '初次冒险', description: '在芙莉莲世界第一次触发探索事件', category: 'event', icon: 'compass', condition: { type: 'event_category', target: 'exploration' } },
+  { id: 'ach_fr_07', title: '魔法修炼', description: '在芙莉莲世界第一次触发修炼事件', category: 'event', icon: 'flame', condition: { type: 'event_category', target: 'cultivation' } },
+  { id: 'ach_fr_08', title: '极速芙莉莲', description: '在芙莉莲世界10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'frieren' } },
+  { id: 'ach_fr_09', title: '勇者传承', description: '在芙莉莲世界单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_fr_10', title: '魔法失效', description: '在芙莉莲世界单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── 高达SEED ──
+  { id: 'ach_gs_01', title: '初入高达', description: '第一次在高达SEED世界完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'gundam_seed' } },
+  { id: 'ach_gs_02', title: '机师达人', description: '在高达SEED世界完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'gundam_seed' } },
+  { id: 'ach_gs_03', title: '高达全结局', description: '解锁高达SEED世界的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'gundam_seed' } },
+  { id: 'ach_gs_04', title: '最强调整者', description: '在高达SEED世界力量属性达到200', category: 'stat', icon: 'dumbbell', condition: { type: 'max_stat_strength', target: 200 } },
+  { id: 'ach_gs_05', title: '战术天才', description: '在高达SEED世界智力属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_gs_06', title: '初次出击', description: '在高达SEED世界第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_gs_07', title: '宇宙探索', description: '在高达SEED世界第一次触发探索事件', category: 'event', icon: 'compass', condition: { type: 'event_category', target: 'exploration' } },
+  { id: 'ach_gs_08', title: '极速高达', description: '在高达SEED世界10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'gundam_seed' } },
+  { id: 'ach_gs_09', title: '和平之光', description: '在高达SEED世界单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_gs_10', title: '战争创伤', description: '在高达SEED世界单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── 超电磁炮 ──
+  { id: 'ach_rg_01', title: '初入学园都市', description: '第一次在学园都市完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'railgun' } },
+  { id: 'ach_rg_02', title: '能力者达人', description: '在学园都市完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'railgun' } },
+  { id: 'ach_rg_03', title: '超电磁炮全结局', description: '解锁学园都市的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'railgun' } },
+  { id: 'ach_rg_04', title: '超电磁炮', description: '在学园都市特殊属性达到200', category: 'stat', icon: 'gem', condition: { type: 'max_stat_special', target: 200 } },
+  { id: 'ach_rg_05', title: '天才少女', description: '在学园都市智力属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_rg_06', title: '初次能力对决', description: '在学园都市第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_rg_07', title: '学园日常', description: '在学园都市第一次触发成长事件', category: 'event', icon: 'user', condition: { type: 'event_category', target: 'growth' } },
+  { id: 'ach_rg_08', title: '极速超电磁炮', description: '在学园都市10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'railgun' } },
+  { id: 'ach_rg_09', title: '能力进化', description: '在学园都市单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_rg_10', title: '能力失控', description: '在学园都市单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── Fate/stay night ──
+  { id: 'ach_ft_01', title: '初入圣杯战争', description: '第一次在Fate世界完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'fate' } },
+  { id: 'ach_ft_02', title: '御主达人', description: '在Fate世界完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'fate' } },
+  { id: 'ach_ft_03', title: 'Fate全结局', description: '解锁Fate世界的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'fate' } },
+  { id: 'ach_ft_04', title: '英灵之力', description: '在Fate世界力量属性达到200', category: 'stat', icon: 'dumbbell', condition: { type: 'max_stat_strength', target: 200 } },
+  { id: 'ach_ft_05', title: '魔术回路', description: '在Fate世界特殊属性达到200', category: 'stat', icon: 'gem', condition: { type: 'max_stat_special', target: 200 } },
+  { id: 'ach_ft_06', title: '初次战斗', description: '在Fate世界第一次触发战斗事件', category: 'event', icon: 'swords', condition: { type: 'event_category', target: 'combat' } },
+  { id: 'ach_ft_07', title: '圣杯探索', description: '在Fate世界第一次触发探索事件', category: 'event', icon: 'compass', condition: { type: 'event_category', target: 'exploration' } },
+  { id: 'ach_ft_08', title: '极速圣杯', description: '在Fate世界10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'fate' } },
+  { id: 'ach_ft_09', title: '圣杯实现', description: '在Fate世界单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_ft_10', title: '黑泥吞噬', description: '在Fate世界单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ── 辉夜大小姐 ──
+  { id: 'ach_kg_01', title: '初入秀知院', description: '第一次在辉夜世界完成转生', category: 'world', icon: 'globe', condition: { type: 'complete_world', target: 'kaguya' } },
+  { id: 'ach_kg_02', title: '恋爱达人', description: '在辉夜世界完成10次转生', category: 'world', icon: 'crown', condition: { type: 'complete_world_count', target: 10, worldId: 'kaguya' } },
+  { id: 'ach_kg_03', title: '辉夜全结局', description: '解锁辉夜世界的所有结局', category: 'world', icon: 'book', condition: { type: 'all_endings', target: 30, worldId: 'kaguya' } },
+  { id: 'ach_kg_04', title: '恋爱天才', description: '在辉夜世界魅力属性达到200', category: 'stat', icon: 'heart', condition: { type: 'max_stat_charisma', target: 200 } },
+  { id: 'ach_kg_05', title: '智将辉夜', description: '在辉夜世界智力属性达到200', category: 'stat', icon: 'brain', condition: { type: 'max_stat_intelligence', target: 200 } },
+  { id: 'ach_kg_06', title: '恋爱事件', description: '在辉夜世界第一次触发恋爱事件', category: 'event', icon: 'heart', condition: { type: 'event_category', target: 'romance' } },
+  { id: 'ach_kg_07', title: '学生会日常', description: '在辉夜世界第一次触发成长事件', category: 'event', icon: 'user', condition: { type: 'event_category', target: 'growth' } },
+  { id: 'ach_kg_08', title: '极速恋爱', description: '在辉夜世界10年内完成转生', category: 'speed', icon: 'wind', condition: { type: 'speed_run_world', target: 10, worldId: 'kaguya' } },
+  { id: 'ach_kg_09', title: '恋爱胜利', description: '在辉夜世界单次转生解锁好结局', category: 'secret', icon: 'smile', condition: { type: 'good_ending', target: 1 } },
+  { id: 'ach_kg_10', title: '恋爱败北', description: '在辉夜世界单次转生解锁坏结局', category: 'secret', icon: 'frown', condition: { type: 'bad_ending', target: 1 } },
+
+  // ═══════════════════════════════════════════════════════════════
   // META ACHIEVEMENTS (12)
   // ═══════════════════════════════════════════════════════════════
   { id: 'ach_ma_01', title: '转生模拟器', description: '完成第一次转生', category: 'meta', icon: 'refresh-cw', condition: { type: 'first_reincarnation', target: 1 } },
