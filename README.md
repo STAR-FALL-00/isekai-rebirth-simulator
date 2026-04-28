@@ -1,73 +1,106 @@
-# React + TypeScript + Vite
+# 🌀 异世界转生模拟器
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 踏上万劫轮回之路，书写属于你的传奇。
 
-Currently, two official plugins are available:
+一款基于浏览器的**文字冒险 + 人生模拟**游戏。每一次转生都是全新的旅程——14 个风格迥异的世界、1000+ 事件模板、80+ 成就、深度羁绊系统，在手机上也能畅玩。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[**🎮 在线试玩**](https://star-fall-00.github.io/isekai-rebirth-simulator/) · [**📦 最新版本 v1.1.0**](https://github.com/STAR-FALL-00/isekai-rebirth-simulator/releases)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ 核心玩法
 
-## Expanding the ESLint configuration
+1. **转生准备** — 装备道具影响命运，然后踏入轮回之门
+2. **事件驱动** — 每一年触发随机事件，打字机效果沉浸式叙事
+3. **抉择时刻** — 关键时刻做出选择，成功或失败改变人生轨迹
+4. **境界突破** — 在各自世界的体系中不断攀升
+5. **结局揭晓** — 寿元耗尽时迎来专属结局，收集图鉴解锁成就
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🌍 14 个转生世界
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| 世界 | 主题 | 境界体系 | 身份数 |
+|:---|:---|:---|:---:|
+| 修仙界 | 东方仙侠 | 炼气 → 大乘 → 飞升 | 10 |
+| 魔法大陆 | 西方奇幻 | 学徒 → 虚空行者 | 10 |
+| 科幻星际 | 未来宇宙 | 殖民者 → 维度行者 | 10 |
+| 末日废土 | 后启示录 | 幸存者 → 变异之王 | 10 |
+| 古代武侠 | 江湖恩怨 | 入门 → 武林神话 | 10 |
+| 浮空要塞 | 隐晦 SAO 主题 | 玩家 → 攻略者 | 10 |
+| **斗破苍穹** | 玄幻逆袭 | 斗之气 → 斗帝 | 10 |
+| **龙族** | 现代奇幻 | 混血种 → 龙王 | 10 |
+| **三体** | 硬科幻 | 面壁者 → 执剑人 | 10 |
+| **葬送的芙莉莲** | 长寿精灵魔法 | 见习 → 大魔法使 | 10 |
+| **高达 SEED** | 机甲战争 | 调整者 → 传说机师 | 10 |
+| **超电磁炮** | 学园都市超能力 | 无能力者 → Level 6 | 10 |
+| **Fate/stay night** | 圣杯战争 | 见习御主 → 冠位御主 | 10 |
+| **辉夜大小姐** | 恋爱喜剧 | 普通学生 → 恋爱大师 | 10 |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+> 💡 每个世界拥有独立的事件模板、境界表、NPC 羁绊角色和专属成就。
+
+---
+
+## 🎮 游戏系统
+
+- **🎯 成就系统** — 80+ 成就，涵盖世界探索、属性极限、速通挑战、隐藏秘密
+- **💕 羁绊系统** — 导师 / 对手 / 恋人三类 NPC，好感度影响事件走向
+- **🎒 道具系统** — 装备道具改变转生概率，每次转生有概率获得新道具
+- **📖 结局图鉴** — 收集全部结局，查看达成条件与隐藏线索
+- **🏆 排行榜** — 最长寿命、最强传奇、速通记录等多维度排名
+- **📱 手机适配** — 针对小屏幕全面优化，可折叠属性面板、触摸友好的交互
+
+---
+
+## 🛠 技术栈
+
+- **前端框架**: React 19 + TypeScript
+- **构建工具**: Vite
+- **样式**: Tailwind CSS
+- **动画**: Framer Motion
+- **图标**: Lucide React
+- **部署**: GitHub Actions → GitHub Pages
+
+---
+
+## 🚀 本地开发
+
+```bash
+# 克隆仓库
+git clone https://github.com/STAR-FALL-00/isekai-rebirth-simulator.git
+cd isekai-rebirth-simulator
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📜 版本历史
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### v1.1.0 — 2025.04
+- 新增 8 个世界（斗破苍穹、龙族、三体、芙莉莲、高达 SEED、超电磁炮、Fate、辉夜大小姐）
+- 全面适配手机端
+- 新增 80 个世界专属成就 + 24 个专属道具
+- GitHub Pages 自动部署
+
+### v1.0.0 — 2025.04
+- 5 大世界深度重构
+- 成就系统、羁绊系统、道具掉落、结算增强
+- 新增「浮空要塞」世界（隐晦 SAO 主题）
+
+---
+
+## 📄 许可证
+
+MIT License © 2025
+
+---
+
+> *"五个世界，一个真相。当你在每个世界都留下自己的痕迹，那痕迹本身将成为打开最终之门的钥匙。"*
