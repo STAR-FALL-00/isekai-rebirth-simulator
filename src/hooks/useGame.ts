@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import type { GameState, Event, Stats } from '@/engine/types';
+import type { GameState, Event, Stats, EventEffects } from '@/engine/types';
+import { WORLD_REALM_TABLES } from '@/engine/types';
 import { createInitialState, startRandomGame } from '@/engine/gameState';
 
 export function useGame() {
@@ -27,9 +28,37 @@ export function useGame() {
     });
   }, []);
 
+  /** Apply event effects, handling both stats and meta fields (realm, maxAge) */
+  const applyEffects = useCallback((prev: GameState, effects: EventEffects) => {
+    const newStats = { ...prev.stats };
+    let newRealm = prev.realm;
+    let newMaxAge = prev.maxAge;
+
+    for (const [key, val] of Object.entries(effects)) {
+      if (key === 'realm' && typeof val === 'number') {
+        newRealm = Math.max(0, Math.min(7, newRealm + val));
+        // When realm increases, also increase maxAge based on cultivation realm table
+        if (val > 0) {
+          const worldId = prev.world?.id ?? 'cultivation';
+          const realmTable = WORLD_REALM_TABLES[worldId] ?? WORLD_REALM_TABLES['cultivation'];
+          const realmInfo = realmTable[newRealm];
+          if (realmInfo) {
+            newMaxAge = realmInfo.maxAgeBase + Math.floor(Math.random() * 50);
+          }
+        }
+      } else if (key === 'maxAge' && typeof val === 'number') {
+        newMaxAge = Math.max(1, newMaxAge + val);
+      } else if (key in newStats) {
+        (newStats as Record<string, number>)[key] = Math.max(0, Math.min(200, (newStats as Record<string, number>)[key] ?? 0) + (val ?? 0));
+      }
+    }
+
+    return { newStats, newRealm, newMaxAge };
+  }, []);
+
   /** Select a choice in an event with success/fail roll */
-  const handleSelectChoice = useCallback((choiceIndex: number): { success: boolean; text: string; effects: Partial<Stats> } | null => {
-    let result: { success: boolean; text: string; effects: Partial<Stats> } | null = null;
+  const handleSelectChoice = useCallback((choiceIndex: number): { success: boolean; text: string; effects: EventEffects } | null => {
+    let result: { success: boolean; text: string; effects: EventEffects } | null = null;
 
     setState((prev) => {
       if (!prev.currentEvent?.choices || !prev.isPlaying) return prev;
@@ -45,12 +74,19 @@ export function useGame() {
 
       result = { success, text: resultText, effects: resultEffects };
 
-      const newStats = { ...prev.stats };
-      for (const key of Object.keys(resultEffects) as (keyof Stats)[]) {
-        newStats[key] = Math.max(0, Math.min(200, (newStats[key] ?? 0) + (resultEffects[key] ?? 0)));
-      }
+      const { newStats, newRealm, newMaxAge } = applyEffects(prev, resultEffects);
 
       const newFlags = [...prev.flags];
+
+      // Add event-level flags (e.g. realm_attempt_1, major_seen_15)
+      if (prev.currentEvent.flags) {
+        for (const flag of prev.currentEvent.flags) {
+          if (!newFlags.includes(flag)) {
+            newFlags.push(flag);
+          }
+        }
+      }
+
       const flagsToAdd = success ? choice.flags : choice.failFlags;
       if (flagsToAdd) {
         for (const flag of flagsToAdd) {
@@ -63,6 +99,8 @@ export function useGame() {
       return {
         ...prev,
         stats: newStats,
+        realm: newRealm,
+        maxAge: newMaxAge,
         flags: newFlags,
         eventHistory: [
           ...prev.eventHistory,
@@ -73,7 +111,7 @@ export function useGame() {
     });
 
     return result;
-  }, []);
+  }, [applyEffects]);
 
   /** Set current event */
   const handleSetEvent = useCallback((event: Event | null) => {
@@ -90,14 +128,24 @@ export function useGame() {
     setState(createInitialState());
   }, []);
 
-  /** Update stats */
-  const handleUpdateStats = useCallback((effects: Partial<Stats>) => {
+  /** Update stats (and meta fields like realm/maxAge) */
+  const handleUpdateStats = useCallback((effects: EventEffects) => {
     setState((prev) => {
-      const newStats = { ...prev.stats };
-      for (const key of Object.keys(effects) as (keyof Stats)[]) {
-        newStats[key] = Math.max(0, Math.min(200, (newStats[key] ?? 0) + (effects[key] ?? 0)));
+      const { newStats, newRealm, newMaxAge } = applyEffects(prev, effects);
+      return { ...prev, stats: newStats, realm: newRealm, maxAge: newMaxAge };
+    });
+  }, [applyEffects]);
+
+  /** Add flags to global state */
+  const handleAddFlags = useCallback((newFlags: string[]) => {
+    setState((prev) => {
+      const merged = [...prev.flags];
+      for (const flag of newFlags) {
+        if (!merged.includes(flag)) {
+          merged.push(flag);
+        }
       }
-      return { ...prev, stats: newStats };
+      return { ...prev, flags: merged };
     });
   }, []);
 
@@ -144,6 +192,7 @@ export function useGame() {
     setEnding: handleSetEnding,
     resetGame: handleResetGame,
     updateStats: handleUpdateStats,
+    addFlags: handleAddFlags,
     addRelationship: handleAddRelationship,
     equipItem: handleEquipItem,
     unequipItem: handleUnequipItem,

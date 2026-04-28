@@ -1,12 +1,12 @@
 export type TalentLevel = 'trash' | 'poor' | 'average' | 'good' | 'genius' | 'legendary';
 
 export const TALENT_DISTRIBUTION: { level: TalentLevel; weight: number; label: string }[] = [
-  { level: 'legendary', weight: 2, label: '绝世' },
-  { level: 'genius', weight: 8, label: '天才' },
-  { level: 'good', weight: 20, label: '良才' },
-  { level: 'average', weight: 35, label: '普通' },
-  { level: 'poor', weight: 25, label: '平庸' },
-  { level: 'trash', weight: 10, label: '废材' },
+  { level: 'legendary', weight: 1, label: '绝世' },
+  { level: 'genius', weight: 5, label: '天才' },
+  { level: 'good', weight: 12, label: '良才' },
+  { level: 'average', weight: 42, label: '普通' },
+  { level: 'poor', weight: 32, label: '平庸' },
+  { level: 'trash', weight: 8, label: '废材' },
 ];
 
 export const TALENT_COLORS: Record<TalentLevel, string> = {
@@ -45,6 +45,7 @@ export interface Identity {
   baseStats: Partial<Stats>;
   exclusiveEvents: string[];
   specialTrait: string;
+  spawnWeight?: number;
 }
 
 export interface NPC {
@@ -53,6 +54,8 @@ export interface NPC {
   type: 'romance' | 'mentor' | 'rival';
   description: string;
 }
+
+export type EventEffects = Partial<Stats> & { realm?: number; maxAge?: number };
 
 export interface Event {
   id: string;
@@ -63,15 +66,15 @@ export interface Event {
   text: string;
   choices?: {
     text: string;
-    effects: Partial<Stats>;
+    effects: EventEffects;
     successText?: string;
     failText?: string;
     successRate?: number;
-    failEffects?: Partial<Stats>;
+    failEffects?: EventEffects;
     flags?: string[];
     nextEventId?: string;
   }[];
-  effects?: Partial<Stats>;
+  effects?: EventEffects;
   conditions?: { stat: string; min?: number; max?: number }[];
   flags?: string[];
   requiredFlags?: string[];
@@ -106,11 +109,75 @@ export interface RebirthItem {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
+export const CULTIVATION_REALMS = [
+  { stage: 0, name: '炼气期', maxAgeBase: 100 },
+  { stage: 1, name: '筑基期', maxAgeBase: 180 },
+  { stage: 2, name: '金丹期', maxAgeBase: 300 },
+  { stage: 3, name: '元婴期', maxAgeBase: 500 },
+  { stage: 4, name: '化神期', maxAgeBase: 800 },
+  { stage: 5, name: '渡劫期', maxAgeBase: 1200 },
+  { stage: 6, name: '大乘期', maxAgeBase: 2000 },
+  { stage: 7, name: '飞升', maxAgeBase: 9999 },
+];
+
+export const MAGIC_REALMS = [
+  { stage: 0, name: '魔法学徒', maxAgeBase: 100 },
+  { stage: 1, name: '初级法师', maxAgeBase: 180 },
+  { stage: 2, name: '大法师', maxAgeBase: 300 },
+  { stage: 3, name: '贤者', maxAgeBase: 500 },
+  { stage: 4, name: '元素使', maxAgeBase: 800 },
+  { stage: 5, name: '真理守护者', maxAgeBase: 1200 },
+  { stage: 6, name: '法则化身', maxAgeBase: 2000 },
+  { stage: 7, name: '虚空行者', maxAgeBase: 9999 },
+];
+
+export const SCIFI_REALMS = [
+  { stage: 0, name: '平民殖民者', maxAgeBase: 100 },
+  { stage: 1, name: '星际战士', maxAgeBase: 180 },
+  { stage: 2, name: '舰长', maxAgeBase: 300 },
+  { stage: 3, name: '舰队统帅', maxAgeBase: 500 },
+  { stage: 4, name: '星际元帅', maxAgeBase: 800 },
+  { stage: 5, name: '银河守护者', maxAgeBase: 1200 },
+  { stage: 6, name: '超维生命', maxAgeBase: 2000 },
+  { stage: 7, name: '星神', maxAgeBase: 9999 },
+];
+
+export const APOCALYPSE_REALMS = [
+  { stage: 0, name: '避难所居民', maxAgeBase: 100 },
+  { stage: 1, name: '废土行者', maxAgeBase: 180 },
+  { stage: 2, name: '聚集地领袖', maxAgeBase: 300 },
+  { stage: 3, name: '觉醒变异者', maxAgeBase: 500 },
+  { stage: 4, name: '废土之王', maxAgeBase: 800 },
+  { stage: 5, name: '末日领主', maxAgeBase: 1200 },
+  { stage: 6, name: '新人类始祖', maxAgeBase: 2000 },
+  { stage: 7, name: '永恒存在', maxAgeBase: 9999 },
+];
+
+export const WUXIA_REALMS = [
+  { stage: 0, name: '江湖新秀', maxAgeBase: 100 },
+  { stage: 1, name: '三流高手', maxAgeBase: 180 },
+  { stage: 2, name: '二流高手', maxAgeBase: 300 },
+  { stage: 3, name: '一流高手', maxAgeBase: 500 },
+  { stage: 4, name: '武林宗师', maxAgeBase: 800 },
+  { stage: 5, name: '大宗师', maxAgeBase: 1200 },
+  { stage: 6, name: '武圣', maxAgeBase: 2000 },
+  { stage: 7, name: '破碎虚空', maxAgeBase: 9999 },
+];
+
+export const WORLD_REALM_TABLES: Record<string, Array<{ stage: number; name: string; maxAgeBase: number }>> = {
+  cultivation: CULTIVATION_REALMS,
+  magic: MAGIC_REALMS,
+  scifi: SCIFI_REALMS,
+  apocalypse: APOCALYPSE_REALMS,
+  wuxia: WUXIA_REALMS,
+};
+
 export interface GameState {
   world: World | null;
   identity: Identity | null;
   age: number;
   maxAge: number;
+  realm: number; // 0-7 cultivation realm stage
   stats: Stats;
   talentLevel: TalentLevel;
   relationships: Record<string, number>;

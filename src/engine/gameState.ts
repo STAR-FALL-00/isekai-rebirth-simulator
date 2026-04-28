@@ -1,5 +1,5 @@
 import type { GameState, Stats, TalentLevel } from './types';
-import { TALENT_DISTRIBUTION } from './types';
+import { TALENT_DISTRIBUTION, WORLD_REALM_TABLES } from './types';
 
 export const defaultStats: Stats = {
   strength: 10,
@@ -35,6 +35,7 @@ export function createInitialState(): GameState {
     identity: null,
     age: 0,
     maxAge: 100,
+    realm: 0,
     stats: { ...defaultStats },
     relationships: {},
     flags: [],
@@ -61,8 +62,18 @@ export function startRandomGame(state: GameState): GameState {
   const worldId = pickRandomWorldByWeights(weights);
   const world = worlds.find((w) => w.id === worldId)!;
 
-  // 3. Pick random identity from the chosen world
-  const identityIndex = Math.floor(Math.random() * world.identities.length);
+  // 3. Pick random identity from the chosen world (weighted by spawnWeight)
+  const identityWeights = world.identities.map((i) => i.spawnWeight ?? 1);
+  const totalIdentityWeight = identityWeights.reduce((s, w) => s + w, 0);
+  let identityRoll = Math.random() * totalIdentityWeight;
+  let identityIndex = 0;
+  for (let i = 0; i < identityWeights.length; i++) {
+    identityRoll -= identityWeights[i];
+    if (identityRoll <= 0) {
+      identityIndex = i;
+      break;
+    }
+  }
   const identity = world.identities[identityIndex];
 
   // 4. Apply base stats from identity
@@ -105,12 +116,20 @@ export function startRandomGame(state: GameState): GameState {
 
   const talentLabel = TALENT_DISTRIBUTION.find(d => d.level === talentLevel)?.label ?? '普通';
 
+  // Calculate starting maxAge based on realm table for the chosen world
+  const realmTable = WORLD_REALM_TABLES[world.id] ?? WORLD_REALM_TABLES['cultivation'];
+  const realmBase = realmTable[0].maxAgeBase;
+  const healthBonus = Math.floor((baseStats.health ?? 50) / 5);
+  const luckBonus = Math.floor((baseStats.luck ?? 10) / 10) * 5;
+  const startMaxAge = realmBase + healthBonus + luckBonus + Math.floor(Math.random() * 20);
+
   return {
     ...state,
     world,
     identity,
     age: 0,
-    maxAge: 80 + Math.floor((baseStats.health ?? 50) / 3) + Math.floor(Math.random() * 20),
+    maxAge: startMaxAge,
+    realm: 0,
     stats: baseStats,
     talentLevel,
     relationships: initialRelationships,

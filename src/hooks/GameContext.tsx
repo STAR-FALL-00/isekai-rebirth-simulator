@@ -10,6 +10,7 @@ export interface GameContextValue {
   setEnding: (ending: NonNullable<GameState['ending']>) => void;
   resetGame: () => void;
   updateStats: (effects: Partial<Stats>) => void;
+  addFlags: (flags: string[]) => void;
   addRelationship: (npcId: string, delta: number) => void;
   equipItem: (itemId: string) => void;
   unequipItem: (itemId: string) => void;

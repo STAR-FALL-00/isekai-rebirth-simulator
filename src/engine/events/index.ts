@@ -1,4 +1,4 @@
-import type { GameEvent, EventTemplate, EventChoice } from './types';
+import type { GameEvent, EventTemplate, EventChoice, EventEffects } from './types';
 import { cultivationTemplates } from './cultivationTemplates';
 import { magicTemplates } from './magicTemplates';
 import { scifiTemplates } from './scifiTemplates';
@@ -21,15 +21,15 @@ const worldTemplates: Record<string, EventTemplate[]> = {
 // Word banks for template interpolation
 const wordBanks: Record<string, Record<string, string[]>> = {
   cultivation: {
-    location: ['村口老槐树', '后山禁地', '村东古井', '西边的瀑布', '北山石窟', '南坡竹林', '自家后院', '祠堂密室'],
-    npc: ['老铁匠', '王猎户', '李大娘', '张秀才', '云游道士', '疯老头', '算命先生', '隔壁老奶奶'],
+    location: ['村口老槐树', '后山禁地', '村东古井', '西边的瀑布', '北山石窟', '南坡竹林', '自家后院', '祠堂密室', '青云宗山门', '万妖森边缘', '幽冥渊入口', '天外天遗址', '上古剑冢', '丹鼎阁', '藏经楼'],
+    npc: ['同门师妹', '散修女侠', '药宗圣女', '狐族少女', '张秀才', '云游道士', '世家小姐', '魔道妖女', '龙族公主', '佛门女弟子'],
     legend: ['上古剑仙', '九尾妖狐', '东海龙王', '昆仑圣母', '魔道至尊', '天道之子', '逍遥散仙'],
     discovery: ['发现了一块发光的石头', '听到了奇怪的声音', '看到了一道金光', '闻到了一股异香', '踩到了一块软软的东西'],
     reaction: ['你吓得跑回了家', '你好奇地走近查看', '你感觉体内有什么在涌动', '你记住这个地方，准备以后再来'],
   },
   magic: {
-    location: ['魔法森林', '学院后院', '魔法井边', '禁忌图书馆', '元素祭坛', '妖精花园'],
-    npc: ['魔法导师', '神秘商人', '精灵使者', '龙族长者', '魔女', '学院院长'],
+    location: ['魔法森林', '学院后院', '魔法井边', '禁忌图书馆', '元素祭坛', '妖精花园', '浮空城广场', '龙脊山脉', '暗影巷', '炼金工坊'],
+    npc: ['魔法导师', '神秘商人', '精灵使者', '贵族小姐', '魔女', '学院同学'],
     legend: ['真理之塔', '元素之王', '暗影领主', '古代大法师', '创世神龙', '魔法之源'],
     discovery: ['发现了一本魔法书', '看到了奇异的光芒', '听到了元素的声音', '感受到了强大的魔力波动'],
     reaction: ['你小心翼翼地靠近', '你兴奋地去查看', '你感到一阵恐惧', '你记下了这个位置'],
@@ -148,6 +148,12 @@ export function getAvailableEvents(
       if (!hasAll) continue;
     }
 
+    // Skip events that have already been triggered (their flags are already set)
+    if (template.flags) {
+      const alreadyTriggered = template.flags.some((f) => flags.includes(f));
+      if (alreadyTriggered) continue;
+    }
+
     // Check stat conditions
     if (template.conditions) {
       let pass = true;
@@ -206,7 +212,7 @@ export function pickEvent(events: GameEvent[]): GameEvent | null {
 // Apply event effects to stats
 // ═══════════════════════════════════════════════════════════════
 
-export function applyEffects(stats: Stats, effects: Partial<Stats>): Stats {
+export function applyEffects(stats: Stats, effects: EventEffects): Stats {
   const newStats = { ...stats };
   for (const key of Object.keys(effects) as (keyof Stats)[]) {
     const val = effects[key];
@@ -224,7 +230,7 @@ export function applyEffects(stats: Stats, effects: Partial<Stats>): Stats {
 export function processChoice(choice: EventChoice): {
   success: boolean;
   text: string;
-  effects: Partial<Stats>;
+  effects: EventEffects;
   flags?: string[];
 } {
   const roll = Math.random();

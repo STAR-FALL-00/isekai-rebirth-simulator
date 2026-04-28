@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, BookOpen, Trophy, Clock, Globe, User, Sparkles, Lock, ScrollText, FlaskConical } from 'lucide-react';
+import { useGameContext } from '@/hooks/GameContext';
+import type { GameState, Stats } from '@/engine/types';
+import { WORLD_REALM_TABLES } from '@/engine/types';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -334,6 +337,169 @@ function getSampleEnding(): EndingDisplay {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Dynamic ending calculation based on actual game state             */
+/* ------------------------------------------------------------------ */
+function calculateEnding(state: GameState): EndingDisplay {
+  const world = state.world;
+  const worldId = world?.id ?? 'cultivation';
+  const worldName = world?.name ?? '修仙界';
+  const identityName = state.identity?.name ?? '无名之人';
+  const age = state.age;
+  const realm = state.realm;
+  const stats = state.stats;
+  const flags = state.flags;
+  const eventCount = state.eventHistory.length;
+  const realmTable = WORLD_REALM_TABLES[worldId] ?? WORLD_REALM_TABLES['cultivation'];
+  const realmName = realmTable[realm]?.name ?? '未知境界';
+
+  // Determine highest stat
+  const statEntries = Object.entries(stats) as [keyof Stats, number][];
+  const highest = statEntries.reduce((a, b) => (a[1] > b[1] ? a : b), statEntries[0] ?? ['health', 0]);
+  const statNameMap: Record<string, string> = world?.statNames ?? {
+    strength: '体质', intelligence: '悟性', charisma: '机缘',
+    luck: '气运', health: '气血', special: '灵根',
+  };
+  const highestStatName = statNameMap[highest[0]] ?? highest[0];
+  const highestStatValue = highest[1];
+
+  // Death cause
+  const diedByHealth = stats.health <= 0;
+  const diedByAge = age >= state.maxAge;
+
+  let category: EndingCategory = 'normal';
+  let title = '';
+  let description = '';
+  const achievements: Achievement[] = [];
+
+  // --- Cultivation world endings ---
+  if (worldId === 'cultivation') {
+    if (realm >= 7) {
+      category = 'good';
+      title = '破碎虚空，羽化飞升';
+      description = `你历经${age}年苦修，终于打破仙界通道，羽化飞升。从此脱离凡界，进入仙界。你的名字被刻在了修仙界的"飞升碑"上，后世修士以你为楷模。`;
+    } else if (realm >= 5) {
+      category = diedByHealth ? 'bad' : 'good';
+      title = diedByHealth ? '渡劫身殒' : '大乘仙君';
+      description = diedByHealth
+        ? '你在渡劫的关键时刻功亏一篑，天雷将你的肉身化为灰烬。修仙界从此少了一位可能的仙人，多了一段遗憾的传说。'
+        : `你以${realmName}的修为笑傲修仙界，距离飞升只差一步之遥。虽然最终未能突破，但你的威名震慑八方，无人敢轻视。`;
+    } else if (realm >= 3) {
+      if (diedByHealth) {
+        category = 'bad';
+        title = '道消身殒';
+        description = '修行之路充满凶险，你在一次意外中身负重伤，最终没能挺过来。你的道统无人继承，洞府很快就被后来者占据。';
+      } else {
+        category = 'good';
+        title = `${realmName}大修士`;
+        description = `你以${realmName}的修为活到了${age}岁，在修仙界也算一方强者。你的故事被后来的散修们传颂，激励着一代又一代人踏上修仙之路。`;
+      }
+    } else if (realm >= 1) {
+      category = diedByHealth ? 'bad' : 'normal';
+      title = diedByHealth ? '英年早逝' : '修仙路上的过客';
+      description = diedByHealth
+        ? '你倒在了修仙之路的早期，未能见证更广阔的天地。如果当初更加谨慎，或许结局会完全不同。'
+        : `你修炼到了${realmName}，但最终未能更进一步。${age}岁时，你的寿元走到了尽头。在修仙界的历史长河中，你只是一个匆匆过客。`;
+    } else {
+      category = diedByHealth ? 'bad' : 'normal';
+      title = diedByHealth ? '凡人之殇' : '无缘仙道';
+      description = diedByHealth
+        ? '你还没来得及踏入真正的修仙之路，就因意外而离世。命运对你太过残酷。'
+        : '终其一生，你都没能突破炼气期。修仙之路对你而言，终究只是一场遥不可及的梦。';
+    }
+
+    // Special flag-based overrides
+    if (flags.includes('major_ascend')) {
+      category = 'secret';
+      title = '仙界先驱';
+      description = '你打破了仙界通道的封印，成为了万古以来第一个主动挑战仙界规则的人。仙界并非乐土，但你的战斗才刚刚开始。';
+    } else if (flags.includes('major_stay')) {
+      category = 'secret';
+      title = '凡界守护者';
+      description = '你拒绝了飞升的诱惑，选择守护凡界。两千年后，你的雕像依然矗立在那片土地上，守护着一代又一代的凡人。';
+    } else if (flags.includes('major_dark') && stats.strength > 80) {
+      category = 'bad';
+      title = '入魔者';
+      description = '你在黑暗中走得太远，最终被自己的心魔吞噬。你成为了修仙界新的威胁，曾经的朋友不得不联手将你封印。';
+    }
+  }
+  // --- Magic world endings ---
+  else if (worldId === 'magic') {
+    if (realm >= 7) {
+      category = 'good';
+      title = '虚空行者';
+      description = '你超越了物质界的束缚，成为了在虚空与物质界自由穿梭的存在。无数文明的兴衰在你眼前展开，你是万古以来最伟大的法师。';
+    } else if (realm >= 5) {
+      category = diedByHealth ? 'bad' : 'good';
+      title = diedByHealth ? '魔力暴走' : '真理守护者';
+      description = diedByHealth
+        ? '你在研究禁忌魔法时失去了控制，魔力暴走将方圆百里化为焦土。你成为了大陆上最令人恐惧的名字。'
+        : `你以${realmName}的身份守护魔法真理，你的大名被刻在了真理之塔的最高处。`;
+    } else if (realm >= 3) {
+      category = diedByHealth ? 'bad' : 'normal';
+      title = diedByHealth ? '魔法殉道者' : realmName;
+      description = diedByHealth
+        ? '你在一次危险的魔法实验中失去了生命，但你的笔记被后人发现，成为了魔法史上的重要文献。'
+        : `你以${realmName}的身份走完了${age}年的人生。在魔法大陆的历史中，你留下了自己的印记。`;
+    } else {
+      category = diedByHealth ? 'bad' : 'normal';
+      title = diedByHealth ? '夭折的学徒' : '平凡的法师';
+      description = diedByHealth
+        ? '你还没来得及展现自己的才华，就在一次意外中离世。魔法学院为你默哀了整整一天。'
+        : '你在魔法之路上走得并不远，但你依然用自己的方式影响了身边的人。';
+    }
+  }
+  // --- Generic worlds (scifi, apocalypse, wuxia) ---
+  else {
+    if (realm >= 7) {
+      category = 'secret';
+      title = worldId === 'scifi' ? '超越时间的观测者' : worldId === 'wuxia' ? '武破虚空' : '新世界的神';
+      description = '你达到了这个世界的最高境界，超越了凡人的极限。你的名字将永远铭刻在历史之中。';
+    } else if (realm >= 5) {
+      category = 'good';
+      title = '一代传奇';
+      description = `你在${worldName}留下了浓墨重彩的一笔，后人将以你的名字命名这个时代。`;
+    } else if (realm >= 2) {
+      category = diedByHealth ? 'bad' : 'normal';
+      title = diedByHealth ? '壮志未酬' : '无名英雄';
+      description = diedByHealth
+        ? '你倒在了追求极致的路上，未能完成自己的夙愿。'
+        : `你在${worldName}生活了${age}年，虽然没有达到巅峰，但也经历了精彩的人生。`;
+    } else {
+      category = diedByHealth ? 'bad' : 'normal';
+      title = diedByHealth ? '不幸的早逝' : '平淡一生';
+      description = '你的人生波澜不惊，在历史的洪流中没有留下太多痕迹。';
+    }
+  }
+
+  // Age-based achievements
+  if (age >= 500) {
+    achievements.push({ id: 'ach_meta_01', name: '长生久视', description: '在任意世界存活超过500年', category: '特殊事件' });
+  }
+  if (eventCount >= 50) {
+    achievements.push({ id: 'ach_meta_03', name: '历经沧桑', description: '经历超过50个事件', category: '特殊事件' });
+  }
+  if (highestStatValue >= 180) {
+    achievements.push({ id: 'ach_stat_01', name: '登峰造极', description: '任意属性达到180以上', category: '属性极限' });
+  }
+  if (realm >= 5) {
+    achievements.push({ id: `ach_${worldId}_01`, name: `${realmName}之路`, description: `达到${realmName}`, category: '世界探索' });
+  }
+
+  return {
+    id: `${worldId}_${category}_${realm}`,
+    title,
+    description,
+    category,
+    worldName,
+    identityName,
+    age,
+    highestStat: { name: highestStatName, value: highestStatValue },
+    eventCount,
+    unlockedAchievements: achievements,
+  };
+}
+
+/* ------------------------------------------------------------------ */
 /*  Typewriter Hook                                                    */
 /* ------------------------------------------------------------------ */
 function useTypewriter(text: string, speed: number, startDelay: number, enabled: boolean) {
@@ -472,10 +638,13 @@ function RainbowBorder({ children, className }: { children: React.ReactNode; cla
 /* ------------------------------------------------------------------ */
 export default function Ending() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const endingId = searchParams.get('id');
+  const { state } = useGameContext();
 
-  const ending = allEndings.find(e => e.id === endingId) || getSampleEnding();
+  // Use dynamically calculated ending based on game state;
+  // fall back to sample ending if no game has been played.
+  const ending = (state.isDead || state.age > 0)
+    ? calculateEnding(state)
+    : getSampleEnding();
   const config = CATEGORY_CONFIG[ending.category];
   const worldColor = WORLD_COLORS[ending.worldName] || '#D4A843';
 

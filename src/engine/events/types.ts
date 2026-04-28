@@ -5,6 +5,8 @@ export type EventCategory =
   | 'combat' | 'romance' | 'cultivation' | 'exploration'
   | 'world_story' | 'identity_exclusive' | 'hidden' | 'death';
 
+export type EventEffects = Partial<Stats> & { realm?: number; maxAge?: number };
+
 export interface EventCondition {
   stat: keyof Stats;
   min?: number;
@@ -16,8 +18,8 @@ export interface EventChoice {
   successText: string;
   failText: string;
   successRate: number;
-  effects: Partial<Stats>;
-  failEffects?: Partial<Stats>;
+  effects: EventEffects;
+  failEffects?: EventEffects;
   flags?: string[];
   failFlags?: string[];
   requiredFlags?: string[];
@@ -30,7 +32,7 @@ export interface EventTemplate {
   maxAge: number;
   templates: string[];
   choices?: EventChoice[];
-  effects?: Partial<Stats>;
+  effects?: EventEffects;
   conditions?: EventCondition[];
   requiredFlags?: string[];
   flags?: string[];
@@ -47,7 +49,7 @@ export interface GameEvent {
   age: number;
   text: string;
   choices?: EventChoice[];
-  effects?: Partial<Stats>;
+  effects?: EventEffects;
   conditions?: EventCondition[];
   requiredFlags?: string[];
   flags?: string[];

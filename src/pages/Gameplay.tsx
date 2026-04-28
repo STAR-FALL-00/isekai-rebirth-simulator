@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameContext } from '@/hooks/GameContext';
-import type { Stats } from '@/engine/types';
+import type { Stats, EventEffects } from '@/engine/types';
+import { WORLD_REALM_TABLES } from '@/engine/types';
 import { TALENT_DISTRIBUTION, TALENT_COLORS } from '@/engine/types';
 import { getAvailableEvents, pickEvent } from '@/engine/events';
 import StatBar from '@/components/StatBar';
@@ -42,13 +43,103 @@ function useTypewriter(text: string, speed: number, enabled: boolean) {
 
 /* ───────────────────── sub-components ───────────────────── */
 
+function BreakthroughEffect({ realm, worldId }: { realm: number; worldId: string }) {
+  const cultivationConfig: Record<number, { color: string; text: string; glow: string }> = {
+    1: { color: '#4BC88A', text: '筑基成功', glow: 'rgba(75,200,138,0.6)' },
+    2: { color: '#D4A843', text: '金丹大成', glow: 'rgba(212,168,67,0.6)' },
+    3: { color: '#9B6BFF', text: '元婴出世', glow: 'rgba(155,107,255,0.6)' },
+    4: { color: '#00D4FF', text: '化神境成', glow: 'rgba(0,212,255,0.6)' },
+    5: { color: '#C84B4B', text: '渡劫境成', glow: 'rgba(200,75,75,0.6)' },
+    6: { color: '#FFFFFF', text: '大乘境成', glow: 'rgba(255,255,255,0.5)' },
+    7: { color: '#FFD700', text: '飞升仙界', glow: 'rgba(255,215,0,0.7)' },
+  };
+  const magicConfig: Record<number, { color: string; text: string; glow: string }> = {
+    1: { color: '#FF6B2D', text: '进阶初级法师', glow: 'rgba(255,107,45,0.6)' },
+    2: { color: '#00D4FF', text: '进阶大法师', glow: 'rgba(0,212,255,0.6)' },
+    3: { color: '#9B6BFF', text: '进阶贤者', glow: 'rgba(155,107,255,0.6)' },
+    4: { color: '#2DD4A0', text: '进阶元素使', glow: 'rgba(45,212,160,0.6)' },
+    5: { color: '#D4A843', text: '进阶真理守护者', glow: 'rgba(212,168,67,0.6)' },
+    6: { color: '#E0E0E0', text: '进阶法则化身', glow: 'rgba(224,224,224,0.5)' },
+    7: { color: '#4A0080', text: '进阶虚空行者', glow: 'rgba(74,0,128,0.7)' },
+  };
+
+  const cfg = worldId === 'magic' ? magicConfig[realm] : cultivationConfig[realm];
+  if (!cfg) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key={`bt-${realm}`}
+        className="fixed inset-0 flex items-center justify-center pointer-events-none"
+        style={{ zIndex: 100 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        {/* background flash */}
+        <motion.div
+          className="absolute inset-0"
+          style={{ background: cfg.glow }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.35, 0] }}
+          transition={{ duration: 1.5, times: [0, 0.3, 1] }}
+        />
+        {/* expanding ring */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: 300, height: 300,
+            border: `3px solid ${cfg.color}`,
+            boxShadow: `0 0 60px ${cfg.color}, 0 0 120px ${cfg.glow}`,
+          }}
+          initial={{ scale: 0, opacity: 1 }}
+          animate={{ scale: 4, opacity: 0 }}
+          transition={{ duration: 1.5, ease: 'easeOut' }}
+        />
+        {/* text */}
+        <motion.div
+          className="relative z-10 flex flex-col items-center"
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
+        >
+          <motion.div
+            className="font-display text-4xl sm:text-5xl font-black mb-2"
+            style={{
+              color: cfg.color,
+              textShadow: `0 0 40px ${cfg.glow}, 0 0 80px ${cfg.color}`,
+            }}
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 1.2, repeat: 1, ease: 'easeInOut' }}
+          >
+            {cfg.text}
+          </motion.div>
+          <motion.div
+            className="font-body text-sm text-text-secondary"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            境界突破
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 function TopBar({
   worldName,
   themeColor,
   age,
+  maxAge,
   health,
   maxHealth,
   statHealthName,
+  realm,
+  realmName,
   autoPlay,
   setAutoPlay,
   fastForward,
@@ -58,9 +149,12 @@ function TopBar({
   worldName: string;
   themeColor: string;
   age: number;
+  maxAge: number;
   health: number;
   maxHealth: number;
   statHealthName: string;
+  realm: number;
+  realmName: string;
   autoPlay: boolean;
   setAutoPlay: (v: boolean) => void;
   fastForward: boolean;
@@ -96,15 +190,16 @@ function TopBar({
         </div>
       </div>
 
-      {/* Age */}
+      {/* Age + Realm */}
       <motion.div
         key={age}
         initial={{ scale: 1.3 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
-        className="absolute left-1/2 -translate-x-1/2 font-display text-xl font-bold text-text-primary"
+        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
       >
-        第 {age} 年
+        <div className="font-display text-xl font-bold text-text-primary">第 {age} 年</div>
+        <div className="text-xs text-text-secondary font-body">{realmName} · 寿元 {age}/{maxAge}</div>
       </motion.div>
 
       {/* HP + Speed */}
@@ -241,18 +336,19 @@ function RelationshipPanel({
 
 export default function Gameplay() {
   const navigate = useNavigate();
-  const { state, advanceYear, selectChoice, updateStats, setEvent } = useGameContext();
+  const { state, advanceYear, selectChoice, updateStats, setEvent, addFlags } = useGameContext();
 
-  const [eventHistory, setEventHistory] = useState<Array<{ age: number; text: string; effects: Partial<Stats>; choices?: { text: string; effects: Partial<Stats>; successText?: string; failText?: string; successRate?: number; failEffects?: Partial<Stats>; flags?: string[] }[]; choiceMade?: number }>>([]);
-  const [currentEvent, setCurrentEvent] = useState<{ age: number; text: string; effects: Partial<Stats>; choices?: { text: string; effects: Partial<Stats>; successText?: string; failText?: string; successRate?: number; failEffects?: Partial<Stats>; flags?: string[] }[] } | null>(null);
-  const [currentChoices, setCurrentChoices] = useState<{ text: string; effects: Partial<Stats>; successText?: string; failText?: string; successRate?: number; failEffects?: Partial<Stats>; flags?: string[] }[] | null>(null);
-  const [statDeltas, setStatDeltas] = useState<Partial<Stats>>({});
+  const [eventHistory, setEventHistory] = useState<Array<{ age: number; text: string; effects: EventEffects; flags?: string[]; choices?: { text: string; effects: EventEffects; successText?: string; failText?: string; successRate?: number; failEffects?: EventEffects; flags?: string[] }[]; choiceMade?: number }>>([]);
+  const [currentEvent, setCurrentEvent] = useState<{ age: number; text: string; effects: EventEffects; flags?: string[]; choices?: { text: string; effects: EventEffects; successText?: string; failText?: string; successRate?: number; failEffects?: EventEffects; flags?: string[] }[] } | null>(null);
+  const [currentChoices, setCurrentChoices] = useState<{ text: string; effects: EventEffects; successText?: string; failText?: string; successRate?: number; failEffects?: EventEffects; flags?: string[] }[] | null>(null);
+  const [statDeltas, setStatDeltas] = useState<EventEffects>({});
   const [showChoices, setShowChoices] = useState(false);
   const [autoPlay, setAutoPlay] = useState(false);
   const [fastForward, setFastForward] = useState(false);
   const [yearFlash, setYearFlash] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDying, setIsDying] = useState(false);
+  const [breakthroughEffect, setBreakthroughEffect] = useState<{ realm: number; worldId: string } | null>(null);
   const [typingComplete, setTypingComplete] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
   const [hasChosen, setHasChosen] = useState(false);
@@ -287,7 +383,7 @@ export default function Gameplay() {
     intelligence: '悟性',
     charisma: '机缘',
     luck: '气运',
-    health: '寿元',
+    health: '气血',
     special: '灵根',
   };
 
@@ -300,7 +396,7 @@ export default function Gameplay() {
       const birthEvent = {
         age: 0,
         text: `你转生到了${world?.name ?? '未知世界'}，成为${identity?.name ?? '无名之人'}。${identity?.description ?? ''} 你的传奇人生就此展开...`,
-        effects: identity?.baseStats ?? {},
+        effects: {},
       };
       setCurrentEvent(birthEvent);
       setTypingComplete(false);
@@ -325,6 +421,9 @@ export default function Gameplay() {
         if (currentEvent.effects && Object.keys(currentEvent.effects).length > 0) {
           updateStats(currentEvent.effects);
           setStatDeltas(currentEvent.effects);
+        }
+        if (currentEvent.flags && currentEvent.flags.length > 0) {
+          addFlags(currentEvent.flags);
         }
       }
     }
@@ -366,6 +465,8 @@ export default function Gameplay() {
     setCurrentChoices(null);
     setTypingComplete(false);
     setStatDeltas({});
+    setHasChosen(false);
+    choiceMadeRef.current = false;
 
     // increment age via hook
     advanceYear();
@@ -395,9 +496,11 @@ export default function Gameplay() {
         age: newAge,
         text: picked?.text ?? '你的生命力耗尽，最终离开了这个世界。',
         effects: picked?.effects ?? { health: -100 },
+        flags: picked?.flags,
       };
       setCurrentEvent(deathEvent);
       setEventHistory((prev) => [...prev, { ...deathEvent }]);
+      if (picked?.flags) addFlags(picked.flags);
       setIsDying(true);
       setIsProcessing(false);
       // redirect to ending after death animation
@@ -417,6 +520,7 @@ export default function Gameplay() {
         age: newAge,
         text: picked.text,
         effects: picked.effects ?? {},
+        flags: picked.flags,
         choices: picked.choices?.map((c) => ({
           text: c.text,
           effects: c.effects,
@@ -441,14 +545,12 @@ export default function Gameplay() {
         text: picked.text,
         choices: event.choices,
         effects: picked.effects,
+        flags: picked.flags,
         probability: picked.probability,
       });
 
-      // apply passive effects (non-choice events)
-      if (!event.choices && Object.keys(event.effects).length > 0) {
-        updateStats(event.effects);
-        setStatDeltas(event.effects);
-      }
+      // Note: passive effects for non-choice events are applied in the
+      // typewriter completion useEffect to avoid double-application.
     } else {
       const fallback = {
         age: newAge,
@@ -457,12 +559,11 @@ export default function Gameplay() {
       };
       setCurrentEvent(fallback);
       setEventHistory((prev) => [...prev, { ...fallback }]);
-      updateStats(fallback.effects);
-      setStatDeltas(fallback.effects);
+      // Fallback effects are applied in the typewriter completion useEffect
     }
 
     setIsProcessing(false);
-  }, [isProcessing, isDying, state.isPlaying, state.age, state.stats, state.maxAge, state.world, state.identity, state.flags, advanceYear, updateStats, setEvent, navigate]);
+  }, [isProcessing, isDying, state.isPlaying, state.age, state.stats, state.maxAge, state.world, state.identity, state.flags, advanceYear, setEvent, addFlags, navigate]);
 
   /* handle choice selection */
   const handleChoice = useCallback(
@@ -477,7 +578,6 @@ export default function Gameplay() {
       const actualEffects = result?.effects ?? choice.effects;
       const actualText = result?.text ?? choice.text;
 
-      updateStats(actualEffects);
       setStatDeltas(actualEffects);
 
       setCurrentChoices(null);
@@ -523,12 +623,19 @@ export default function Gameplay() {
         // but the flags from choice are already handled by selectChoice in useGame
       }
 
+      // Trigger breakthrough visual effect if realm increased
+      if (actualEffects && typeof actualEffects.realm === 'number' && actualEffects.realm > 0) {
+        const newRealm = (state.realm ?? 0) + actualEffects.realm;
+        setBreakthroughEffect({ realm: newRealm, worldId: state.world?.id ?? 'cultivation' });
+        setTimeout(() => setBreakthroughEffect(null), 2500);
+      }
+
       // auto-advance after a short delay
       if (autoPlay) {
         setTimeout(() => handleNextYear(), fastForward ? 400 : 1000);
       }
     },
-    [showChoices, currentEvent, selectChoice, updateStats, autoPlay, fastForward, handleNextYear]
+    [showChoices, currentEvent, selectChoice, autoPlay, fastForward, handleNextYear, state.realm, state.world]
   );
 
   // Reset hasChosen when a new event with choices appears
@@ -605,9 +712,12 @@ export default function Gameplay() {
         worldName={world.name}
         themeColor={themeColor}
         age={state.age}
+        maxAge={state.maxAge}
         health={state.stats.health}
-        maxHealth={state.maxAge}
+        maxHealth={100}
         statHealthName={statNames.health}
+        realm={state.realm}
+        realmName={(WORLD_REALM_TABLES[world?.id ?? 'cultivation']?.[state.realm]?.name) ?? '未知境界'}
         autoPlay={autoPlay}
         setAutoPlay={setAutoPlay}
         fastForward={fastForward}
@@ -874,6 +984,11 @@ export default function Gameplay() {
         </svg>
         {isDying ? '查看结局' : showChoices ? '请选择...' : '下一岁'}
       </motion.button>
+
+      {/* Breakthrough visual effect */}
+      {breakthroughEffect && (
+        <BreakthroughEffect realm={breakthroughEffect.realm} worldId={breakthroughEffect.worldId} />
+      )}
     </div>
   );
 }
